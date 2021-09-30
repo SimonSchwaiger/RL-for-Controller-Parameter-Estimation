@@ -25,7 +25,11 @@ cd /app
 # start ros nodes and put them to the background
 roslaunch saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &
 
+# run interactive marker
+python interactive_marker.py &
+
 # start interactive shell for whatever you want to do
 # if you want to automatically launch something, you can do that here
-python
+#sleep 5
+python #pyBulletTest.py
 
