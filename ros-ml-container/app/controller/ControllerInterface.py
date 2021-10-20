@@ -267,6 +267,8 @@ axs[2].plot(t, pos_sim[:,2,0])
 
 plt.show()
 
+# Hebi Motor Control Docs
+# https://docs.hebi.us/core_concepts.html#motor_control
 
 
 # Plot command signals
@@ -279,3 +281,23 @@ plt.show()
 #axs[2].set_title('J3')
 #axs[2].plot(t, pos_cmd[:,2])
 #plt.show()
+
+
+
+
+
+
+"""
+Good Sources:
+
+- Variational Inference Review
+https://ieeexplore.ieee.org/abstract/document/8588399
+
+
+- Variational Inference Tutorial Python
+https://zhiyzuo.github.io/VI/
+
+- Variational Inference Tutorial Python (das gleiche wie oben?)
+https://www.ritchievink.com/blog/2019/09/16/variational-inference-from-scratch/
+
+"""
