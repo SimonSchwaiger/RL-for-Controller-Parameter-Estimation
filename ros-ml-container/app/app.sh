@@ -6,8 +6,9 @@ source /catkin_ws/devel/setup.bash
 
 ## GYM &  PlaidML Setup
 
-# install gym env
+# install gym envs
 pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
+pip3 install -e /app/gym-jointcontrol
 # initiate plaidml
 plaidml-setup
 
@@ -23,7 +24,7 @@ mv SAImon.urdf /app
 cd /app
 
 # start ros nodes and put them to the background
-roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &
+#roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &
 
 # run interactive marker
 #python interactive_marker.py &
@@ -32,4 +33,5 @@ roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=
 # if you want to automatically launch something, you can do that here
 #sleep 5
 python #pyBulletTest.py
+
 

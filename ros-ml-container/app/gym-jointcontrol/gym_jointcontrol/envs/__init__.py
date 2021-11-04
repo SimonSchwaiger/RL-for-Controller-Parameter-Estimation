@@ -1,0 +1,1 @@
+from gym_jointcontrol.envs.jointcontrol_env import jointcontrol_env
