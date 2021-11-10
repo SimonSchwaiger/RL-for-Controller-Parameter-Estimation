@@ -8,7 +8,7 @@ source /catkin_ws/devel/setup.bash
 
 # install gym envs
 pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
-pip3 install -e /app/gym-jointcontrol
+pip3 install -e /app/jointcontrol/gym-jointcontrol
 # initiate plaidml
 plaidml-setup
 
@@ -32,6 +32,8 @@ cd /app
 # start interactive shell for whatever you want to do
 # if you want to automatically launch something, you can do that here
 #sleep 5
-python #pyBulletTest.py
+#python #pyBulletTest.py
+
+bash
 
 
