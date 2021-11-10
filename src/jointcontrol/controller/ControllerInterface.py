@@ -96,7 +96,7 @@ class TrajectoryGenerator:
         pass
 
 ## Init Environment, home robot and set start and goal states
-rospy.init_node("SmartControl")
+rospy.init_node("jointcontrol/controllerInterface")
 
 save_model = False
 load_pretrained = True
