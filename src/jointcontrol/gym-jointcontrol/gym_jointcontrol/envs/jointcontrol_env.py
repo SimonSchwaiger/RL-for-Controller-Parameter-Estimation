@@ -1,4 +1,6 @@
 import math
+import sys
+
 import gym
 from gym import spaces, logger
 from gym.utils import seeding
@@ -113,3 +115,30 @@ class jointcontrol_env(gym.Env):
     """
     def __init__(self, **kwargs):
         print("Hello World")
+
+        # Get current joint index from keyword arguments
+        jointidx = kwargs.get('jointidx', 0)
+
+        # Init ros node
+        try:
+            rospy.init_node("j{}control_gym".format(jointidx))
+        except rospy.exceptions.ROSException:
+            pass
+
+        # Create callback methods
+        def rosShutdownHandler():
+            sys.exit("External Shutdown")
+
+        # Load joint controller configuration from ros parameter server
+        assert rospy.has_param("/jointcontrol")
+        params = rospy.get_param("/jointcontrol")
+        assert params["NumJoints"]>=jointidx
+        self.controllerParams = params["Joints"][jointidx]
+
+        # Get number of params of used joint in order to create state and action representations
+        numParams = self.controllerParams["NumParams"]
+
+        # Define shape of state, action and reward
+        # state = Box
+        # reward = float
+        # action = Box

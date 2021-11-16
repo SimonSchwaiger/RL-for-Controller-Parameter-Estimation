@@ -19,6 +19,9 @@ if __name__ == "__main__":
     with open(path) as json_file:
         jsonData = json.load(json_file)
 
+    # Check if the specified numbers of joints are actually included
+    assert len(jsonData["Joints"])==jsonData["NumJoints"], "Wrong number of joints specified"
+
     # Add number of joints as parameter
     setParameter("/jointcontrol/NumJoints", jsonData["NumJoints"])
 
