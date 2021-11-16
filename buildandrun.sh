@@ -1,4 +1,5 @@
 #!/bin/bash
+GRAPHICS_PLATFORM="${GRAPHICS_PLATFORM:-cpu}"
 
 # Download des ROS ML Containers falls dieser noch nicht vorhanden ist
 if [ ! -d  "ros-ml-container" ]; then
@@ -24,4 +25,4 @@ cp requirements.txt ros-ml-container/requirements.txt
 
 # Ausführen des Containers
 cd ros-ml-container
-GRAPHICS_PLATFORM=intel ./buildandrun.sh
+GRAPHICS_PLATFORM=$GRAPHICS_PLATFORM ./buildandrun.sh

@@ -8,20 +8,23 @@ source /catkin_ws/devel/setup.bash
 
 # install gym envs
 pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
-pip3 install -e /app/jointcontrol/gym-jointcontrol
+pip3 install -e /catkin_ws/src/jointcontrol/gym-jointcontrol
 # initiate plaidml
 plaidml-setup
 
 ## ROS Setup
 
-# start roscore
+# Start roscore
 roscore &
 
-# load SAImon xacro and convert it to urdf for pybullet
+# Load SAImon xacro and convert it to urdf for pybullet
 cd /catkin_ws/src/RL-with-3DOF-Robots/saimon/urdf 
 rosrun xacro xacro -o SAImon.urdf SAImon.xacro
 mv SAImon.urdf /app
 cd /app
+
+# Load controller configuration as ROS parameters
+python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcontrol)/config/saimonConfig.json
 
 # start ros nodes and put them to the background
 #roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &

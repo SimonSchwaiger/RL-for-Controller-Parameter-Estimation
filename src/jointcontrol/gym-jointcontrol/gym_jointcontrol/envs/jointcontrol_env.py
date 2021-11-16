@@ -13,7 +13,8 @@ def getJointDict(name, numParams, defaultParams, ):
         "name": name,
         "numParams": numParams,
         "defaultParams": defaultParams,
-        "optimisedParams": defaultParams
+        "optimisedParams": defaultParams,
+        "performance": None
     }
 
 
