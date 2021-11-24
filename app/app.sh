@@ -37,6 +37,6 @@ python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcon
 #sleep 5
 #python #pyBulletTest.py
 
-bash
-
+python
+#bash
 

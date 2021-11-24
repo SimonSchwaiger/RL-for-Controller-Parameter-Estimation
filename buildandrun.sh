@@ -1,7 +1,7 @@
 #!/bin/bash
 GRAPHICS_PLATFORM="${GRAPHICS_PLATFORM:-cpu}"
 
-# Download des ROS ML Containers falls dieser noch nicht vorhanden ist
+# Download ROS ML container and clone required github repos
 if [ ! -d  "ros-ml-container" ]; then
     git clone https://github.com/SimonSchwaiger/ros-ml-container
     # Initialer Download der benötigten Software Pakete
@@ -12,17 +12,17 @@ if [ ! -d  "ros-ml-container" ]; then
     cd ../..
 fi
 
-# Anlegen des src Ordners falls dieser noch nicht vorhanden ist
+# Create src dir if it's not already present
 if [ ! -d "src" ]; then
     mkdir src
 fi
 
-# Kopieren der Applikation
+# Copy application
 rm -rf ros-ml-container/app
 cp -r app ros-ml-container
 cp -r src/. ros-ml-container/src/
 cp requirements.txt ros-ml-container/requirements.txt
 
-# Ausführen des Containers
+# Start container
 cd ros-ml-container
 GRAPHICS_PLATFORM=$GRAPHICS_PLATFORM ./buildandrun.sh

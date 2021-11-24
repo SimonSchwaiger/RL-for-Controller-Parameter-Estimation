@@ -32,6 +32,7 @@ if __name__ == "__main__":
         assert len(entry["Defaults"])==entry["NumParams"], "Wrong number of given Defaults for ".format(entry["Name"])
         assert len(entry["Minimums"])==entry["NumParams"], "Wrong number of given Minimums for ".format(entry["Name"])
         assert len(entry["Maximums"])==entry["NumParams"], "Wrong number of given Maximums for ".format(entry["Name"])
+        assert len(entry["MaxChange"])==entry["NumParams"], "Wrong number of given MaxChange values for ".format(entry["Name"])
 
         # Set up path of current parameter
         name = "/jointcontrol/{}".format(entry["Name"])
