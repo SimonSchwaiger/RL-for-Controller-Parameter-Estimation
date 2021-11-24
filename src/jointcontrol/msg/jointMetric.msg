@@ -1,0 +1,4 @@
+string name
+std_msgs/Int32 pollFrequency
+std_msgs/Float64 controlSignal
+std_msgs/Float64 feedbackSignal
