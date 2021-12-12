@@ -26,6 +26,10 @@ cd /app
 # Load controller configuration as ROS parameters
 python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcontrol)/config/saimonConfig.json
 
+# Start simulated Robot
+python jointController.py &
+
+
 # start ros nodes and put them to the background
 #roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &
 
@@ -38,5 +42,5 @@ python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcon
 #python #pyBulletTest.py
 
 python
-#bash
+
 

@@ -10,6 +10,9 @@ if [ ! -d  "ros-ml-container" ]; then
     git clone https://github.com/TW-Robotics/RL-with-3DOF-Robots
     git clone https://github.com/HebiRobotics/hebi_description
     cd ../..
+    cd app
+    git clone https://github.com/HebiRobotics/hebi_description
+    cd ..
 fi
 
 # Create src dir if it's not already present

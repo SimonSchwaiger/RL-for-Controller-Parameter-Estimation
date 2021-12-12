@@ -102,6 +102,7 @@ class jointcontrol_env(gym.Env):
 
     Gym Core Env Implementation:
         https://github.com/openai/gym/blob/master/gym/core.py
+        https://ctms.engin.umich.edu/CTMS/index.php?aux=Extras_PIDbilin
         
     """
     def __init__(self, **kwargs):
