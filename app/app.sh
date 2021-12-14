@@ -10,7 +10,7 @@ source /catkin_ws/devel/setup.bash
 pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
 pip3 install -e /catkin_ws/src/jointcontrol/gym-jointcontrol
 # initiate plaidml
-plaidml-setup
+#plaidml-setup
 
 ## ROS Setup
 

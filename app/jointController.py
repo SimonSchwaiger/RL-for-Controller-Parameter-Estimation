@@ -14,26 +14,27 @@ import time
 
 def clampValue(val, valMax):
     """ Makes sure that a value is within [-valMax, valMax] """
-    valMin = -1*valMax
+    if valMax == None: return val
     if val > valMax: return valMax
-    elif val < valMin: return valMin
+    elif val < -1*valMax: return -1*valMax
     else: return val
 
 class PIDController:
     """ Discrete PID controller approximated using the Tustin (trapezoid) approximation """
-    def __init__(self, kp=0, ki=0, kd=0, ts=0, bufferLength=3) -> None:
-        self.bufferLength = bufferLength
+    def __init__(self, kp=0, ki=0, kd=0, ts=0, feedforward=0, bufferLength=3) -> None:
+        #self.bufferLength = bufferLength
         self.k1 = 0
         self.k2 = 0
         self.k3 = 0
-        self.e = [0 for i in range(self.bufferLength)]
-        self.y = [0 for i in range(self.bufferLength)]
-        #self.setConstants(kp, ki, kd, ts)
+        self.e = [0 for i in range(bufferLength)]
+        self.y = [0 for i in range(bufferLength)]
+        self.feedforward = feedforward
+        if ts != 0:  self.setConstants(kp, ki, kd, ts)
     #
     def setConstants(self, kp, ki, kd, ts):
-        self.k1 = kp+((ki*ts)/2)+(2*kd)/ts
-        self.k2 = ki*ts-(4*kd)/ts
-        self.k3 = -1*kp+(ki*ts)/2+(2*kd)/ts        
+        self.k1 = kp+((ki*ts)/2)+((2*kd)/ts)
+        self.k2 = ki*ts-((4*kd)/ts)
+        self.k3 = (-1*kp)+((ki*ts)/2)+((2*kd)/ts)   
     #
     def update(self, e):
         # Update buffered input and output signals
@@ -43,7 +44,54 @@ class PIDController:
         e = self.e
         y = self.y
         # Calculate output signal and return output
-        y[0] = e[0]*self.k1+e[1]*self.k2+e[2]*self.k3+y[2]
+        y[0] = e[0]*self.k1 + e[1]*self.k2 + e[2]*self.k3 + y[2]
+        return y[0] + e[0]*self.feedforward
+
+class PT1Block:
+    """ Discrete PT1 block approximated using the Tustin (trapezoid) approximation """
+    def __init__(self, kp=1, T1=0, ts=0, bufferLength=2) -> None:
+        self.k1 = 0
+        self.k2 = 0
+        self.e = [0 for i in range(bufferLength)]
+        self.y = [0 for i in range(bufferLength)]
+        if ts != 0: self.setConstants(kp, T1, ts)
+    #
+    def setConstants(self, kp, T1, ts):
+        t = 2*(T1/ts)
+        self.k1 = kp/(1+t)
+        self.k2 = (1-t)/(1+t)
+    #
+    def update(self, e):
+        # Update buffered input and output signals
+        self.e = [e]+self.e[:len(self.e)-1]
+        self.y = [0]+self.y[:len(self.y)-1]
+        # Shorten variable names for better readability
+        e = self.e
+        y = self.y
+        # Calculate output signal and return output
+        y[0] = (e[0] + e[1])*self.k1 - y[1]*self.k2
+        return y[0]
+
+class DBlock:
+    def __init__(self, kd=0, ts=0, bufferLength=2) -> None:
+        self.k = 0
+        self.e = [0 for i in range(bufferLength)]
+        self.y = [0 for i in range(bufferLength)]
+        if ts != 0: self.setConstants(kd, ts)
+    #
+    def setConstants(self, kd, ts):
+        self.k = (2*kd)/ts
+    #
+    def update(self, e):
+        if self.k == 0: return 0
+        # Update buffered input and output signals
+        self.e = [e]+self.e[:len(self.e)-1]
+        self.y = [0]+self.y[:len(self.y)-1]
+        # Shorten variable names for better readability
+        e = self.e
+        y = self.y
+        # Calculate output signal and return output
+        y[0] = e[0]*self.k - e[1]*self.k - y[1]
         return y[0]
 
 class strategy4Controller:
@@ -56,31 +104,70 @@ class strategy4Controller:
         # Default controller params:
         # https://docs.hebi.us/resources/gains/X5-4_STRATEGY4.xml
         self.PositionPID = PIDController()
-        self.VelocityPID = PIDController()
-        self.EffortPID = PIDController()
+        self.VelocityPID = PIDController(feedforward=1)
+        self.EffortPID   = PIDController(feedforward=1)
+        self.EffortD     = DBlock()
+        # Use in- and output filters to mimick motor constraints
+        # Order is [pos, vel, effort] and params are for the X4-5 model
+        self.inputFilters = [
+            PT1Block(kp=1, T1=0, ts=ts),
+            PT1Block(kp=1, T1=0, ts=ts),
+            PT1Block(kp=1, T1=0, ts=ts)
+        ]
+        self.outputFilters = [
+            PT1Block(kp=1, T1=0,    ts=ts),
+            PT1Block(kp=1, T1=0.75, ts=ts),
+            PT1Block(kp=1, T1=0.9,  ts=ts)
+        ]
+        # Mimick damping of motor
+        # https://docs.hebi.us/resources/x-series/freq_response/FreqResponse_X5-4.png
+        self.PWMFilter = PT1Block(kp=1, T1=0.1, ts=ts)
     #
     def updateConstants(self, constants):
         """ Calculates constants in each PID controller """
         self.PositionPID.setConstants(constants[0], constants[1], constants[2], self.ts)
         self.VelocityPID.setConstants(constants[3], constants[4], constants[5], self.ts)
-        self.EffortPID.setConstants(constants[6], constants[7], constants[8], self.ts)
+        self.EffortPID.setConstants(  constants[6], constants[7], 0,            self.ts)
+        self.EffortD.setConstants(constants[8],                                 self.ts)
     #
-    def update(self, vecIn, feedback):
+    def update(self, vecIn, feedback, targetConstraints=[None, 3.43, 20], outputConstraints=[10, 1, 1]):
         """ 
         Takes feedback and control signal and processes output signal 
         
         Format vecIn & feedback: [pos, vel, effort]
         """
         # All signal vectors are of form [Position, Velocity, Effort]
-        # The values are clamped at the output of each PID controller, like in the Hebi implementation
-        # Update Position PID (input = positionIn - positionFeedback)
-        effort = clampValue(self.PositionPID.update(vecIn[0] - feedback[0]), 10)
-        # Update Effort PID (input = yPositionPID + effortIn - effortFeedback)
-        PWM1 = clampValue(self.EffortPID.update(effort + vecIn[2] - feedback[2]), 1)
-        # Update Velocity PID (input = velocityIn - velocityFeedback)
-        PWM2 = clampValue(self.VelocityPID.update(vecIn[1] - feedback[1]), 1)
-        # Return sum of PWM signals
-        return PWM1 + PWM2
+        # The values are clamped at the input and output of each PID controller, like in the Hebi implementation
+        # Clamp input values
+        vecIn = [ clampValue(entry, valMax) for entry, valMax in zip(vecIn, targetConstraints) ]
+        # Apply input T1 filters to input values 
+        vecIn = [ block.update(entry) for entry, block in zip(vecIn, self.inputFilters) ]
+        #
+        print("Control Error Pos, Vel, Effort: {}, {}, {}".format(vecIn[0] - feedback[0], vecIn[1] - feedback[1], vecIn[2] - feedback[2]))
+        # Update Position PID (input = positionIn - positionFeedback), apply output filtering and clamp output value
+        effort = self.PositionPID.update(vecIn[0] - feedback[0])
+        print("Effort 1: {}".format(effort))
+        effort = self.outputFilters[0].update(effort)
+        print("Effort 2: {}".format(effort))
+        effort = clampValue(effort, outputConstraints[0])
+        print("Effort 3: {}".format(effort))
+        # Update Effort PID (input = yPositionPID + effortIn - effortFeedback), apply output filtering and clamp output value
+        # The parallel effort D controller is added here as well without subtracting the feedback
+        PWM1 = self.EffortPID.update(effort + vecIn[2] - feedback[2]) + self.EffortD.update(effort + vecIn[2])
+        print("Effort 4: {}".format(PWM1))
+        PWM1 = self.outputFilters[2].update(PWM1)
+        print("Effort 5: {}".format(PWM1))
+        PWM1 = clampValue(PWM1, outputConstraints[2])
+        print("Effort 5: {}".format(PWM1))
+        # Update Velocity PID (input = velocityIn - velocityFeedback) , apply output filtering and clamp output value
+        PWM2 = self.VelocityPID.update(vecIn[1] - feedback[1])
+        print("PWM2 1: {}".format(PWM2))
+        PWM2 = self.outputFilters[1].update(PWM2)
+        print("PWM2 1: {}".format(PWM2))
+        PWM2 = clampValue(PWM2, outputConstraints[1])
+        print("PWM2 1: {}".format(PWM2))
+        # Return sum of PWM signals (PWM filter is applied here to mimick frequency response of the X5-4 motor)
+        return self.PWMFilter.update(clampValue(PWM1 + PWM2, 1))
 
 class bulletSim:
     """ Class that instantiates a simulated robot using Pybullet """
@@ -93,12 +180,21 @@ class bulletSim:
         p.setAdditionalSearchPath(pybullet_data.getDataPath()) #optionally
         # Spawn gravity and groundplane
         p.setGravity(0,0,-9.8)
+        #p.setGravity(0,0,0)
         planeId = p.loadURDF("plane.urdf")
-        startPos = [0,0,1]
-        startOrientation = p.getQuaternionFromEuler([0,0,0])
+        #startPos = [0,0,1]
+        #startOrientation = p.getQuaternionFromEuler([0,0,0])
         # Load robot model
         #TODO fix Endeffector not loading in
         self.robotID = p.loadURDF("SAImon.urdf")
+        # Add damping to mimick motor inertia and friction #TODO: what units are used here in pybullet? Nm and Nm/rad?!
+        # https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=12685
+        p.changeDynamics(self.robotID,1,linearDamping=0.04, angularDamping=70)
+        p.changeDynamics(self.robotID,3,linearDamping=0.04, angularDamping=70)
+        p.changeDynamics(self.robotID,5,linearDamping=0.04, angularDamping=70)
+        #p.setJointMotorControl2(self.robotID,1,p.VELOCITY_CONTROL,targetVelocity=0,force=70)
+        #p.setJointMotorControl2(self.robotID,3,p.VELOCITY_CONTROL,targetVelocity=0,force=70)
+        #p.setJointMotorControl2(self.robotID,5,p.VELOCITY_CONTROL,targetVelocity=0,force=70)
         # Print joint info
         print('Printing Joint Summary')
         for joint in range(p.getNumJoints(self.robotID)):
@@ -139,7 +235,7 @@ class bulletSim:
         if torque < 0: return torque + friction
         else: return torque - friction
     #
-    def torqueControlUpdate(self, torques, friction=10):
+    def torqueControlUpdate(self, torques, friction=5):
         """ Applies direct force to the robot joints """
         mode = p.TORQUE_CONTROL
         # Simulate friction directly as part of the joint and apply torque to the robot
@@ -160,6 +256,7 @@ class bulletSim:
             [
                 jointState[:,0].astype(float),
                 jointState[:,1].astype(float),
+                #np.array([0,0,0], dtype=float)
                 np.array(torques, dtype=float)
             ]
         ).T
@@ -169,7 +266,7 @@ def PWM2Torque(PWM, maxMotorTorque=7.5):
     """ Converts PWM output signals of the strategy 4 controller to direct torque outputs (Nm) for Pybullet """
     # PWM range -> [-1, 1], Since we have X5-4 motors, the max torque is 7.5 Nm
     # Source: https://docs.hebi.us/core_concepts.html#control-strategies
-    return (PWM+1)*(maxMotorTorque/2)
+    return PWM*maxMotorTorque
 
 def deserialiseJointstate(js):
     """ Converts Jointstate message into the format used for the strategy 4 controller """
@@ -188,7 +285,6 @@ class simulatedRobot:
         self.robot = bulletSim(ts=ts)
         # Deactivate the internal positional controller
         feedback = self.robot.positionControlUpdate(cmdForce=[0,0,0])
-        print(feedback)
         # Init Node and get controller params
         rospy.init_node("ControllerInterface")
         j1Params = rospy.get_param("jointcontrol/J1/Defaults")
@@ -243,6 +339,7 @@ if __name__ == "__main__":
     sim = simulatedRobot()
 
 
+
 """
 DEBUG
 
@@ -271,7 +368,7 @@ jspub = rospy.Publisher("jointcontroller/jointstateTarget", JointState, queue_si
 
 js = JointState()
 js.name = ['J1', 'J2', 'J3']
-js.position = [0,0,0]
+js.position = [0,-1.57,0]
 js.velocity = [0,0,0]
 js.effort = [0,0,0]
 
