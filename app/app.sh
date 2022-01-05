@@ -18,7 +18,7 @@ pip3 install -e /catkin_ws/src/jointcontrol/gym-jointcontrol
 roscore &
 
 # Load SAImon xacro and convert it to urdf for pybullet
-cd /catkin_ws/src/RL-with-3DOF-Robots/saimon/urdf 
+cd /catkin_ws/src/jointcontrol/urdf 
 rosrun xacro xacro -o SAImon.urdf SAImon.xacro
 mv SAImon.urdf /app
 cd /app
@@ -29,6 +29,7 @@ python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcon
 # Start simulated Robot
 python jointController.py &
 
+#python
 
 # start ros nodes and put them to the background
 #roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &

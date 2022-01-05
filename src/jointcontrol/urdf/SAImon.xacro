@@ -1,0 +1,48 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="SAImon">
+  <!-- FHTW 3DOF Arm  -->
+  <xacro:include filename="$(find hebi_description)/urdf/hebi.xacro"/>
+  <xacro:include filename="$(find saimon)/urdf/link_nocap.xacro"/>
+  <xacro:arg name="hebi_base_frame" default="world"/>
+  <xacro:property name="hebi_base_frame" value="$(arg hebi_base_frame)"/>
+  <xacro:if value="${hebi_base_frame == 'world'}">
+    <link name="$(arg hebi_base_frame)"/>
+  </xacro:if>
+  <joint name="$(arg hebi_base_frame)_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="$(arg hebi_base_frame)"/>
+    <child link="Arm/J1/INPUT_INTERFACE"/>
+  </joint>
+  <xacro:actuator type="X5_4" name="Arm/J1" child="shoulder_bracket"/>
+  <xacro:bracket type="X5HeavyLeftInside" name="shoulder_bracket" child="Arm/J2"/>
+  <xacro:actuator type="X5_9" name="Arm/J2" child="shoulder_elbow"/>
+  <xacro:link type="X5" extension="0.175" twist="3.1415" name="shoulder_elbow" child="Arm/J3"/>
+  <xacro:actuator type="X5_4" name="Arm/J3" child="elbow_wrist"/>
+  <xacro:link_nocap type="X5" extension="0.175" twist="${0}" name="elbow_wrist" child="end_effector" output="Inline"/>
+
+  <link name="end_effector/INPUT_INTERFACE">
+    <visual>
+      <origin rpy="0 ${1.5*pi} 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://saimon/meshes/endeffector_assembly.stl" scale="0.001 0.001 0.001"/>
+      </geometry>
+    </visual>
+  </link>
+
+  <joint name="end_effector/OUTPUT_JOINT" type="fixed">
+    <parent link="end_effector/INPUT_INTERFACE"/>
+    <child link="TCP/INPUT_INTERFACE"/>
+    <origin xyz="0 0 0.09" rpy="0 0 0"/>
+    <gazebo reference="end_effector/OUTPUT_JOINT">
+      <disableFixedJointLumping>true</disableFixedJointLumping>
+      <preserveFixedJoint>true</preserveFixedJoint>
+    </gazebo>
+  </joint>
+
+  <link name="TCP/INPUT_INTERFACE">
+  </link>
+  
+  <gazebo reference="base">
+     <selfCollide>true</selfCollide>
+  </gazebo>
+</robot>

@@ -142,8 +142,9 @@ class jointcontrol_env(gym.Env):
 
         # Wait for messages to come in and clear initial output
         time.sleep(5)
-        if self.tracker.getAverageError() == None:
+        while self.tracker.getAverageError() == None:
             rospy.logwarn("J{} has not received jointmetric data on startup".format(self.jointidx))
+            time.sleep(2)
 
         #TODO: wait for metrics to come in before proceeding
 

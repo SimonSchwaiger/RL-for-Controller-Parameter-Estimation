@@ -94,6 +94,38 @@ class DBlock:
         y[0] = e[0]*self.k - e[1]*self.k - y[1]
         return y[0]
 
+class PT2Block:
+    """ Discrete PT2 Block approximated using the Tustin approximation """
+    def __init__(self, T=0, D=0, kp=1, ts=0, bufferLength=3) -> None:
+        self.k1 = 0
+        self.k2 = 0
+        self.k3 = 0
+        self.k4 = 0
+        self.k5 = 0
+        self.k6 = 0
+        self.e = [0 for i in range(bufferLength)]
+        self.y = [0 for i in range(bufferLength)]
+        if ts != 0:  self.setConstants(T, D, kp, ts)
+    #
+    def setConstants(self, T, D, kp, ts):
+        self.k1 = 4*T**2 + 4*D*T*ts + ts**2
+        self.k2 = 2*ts**2 - 8*T**2
+        self.k3 = 4*T**2 - 4*D*T*ts + ts**2
+        self.k4 = kp*ts**2
+        self.k5 = 2*kp*ts**2
+        self.k6 = kp*ts**2
+    #
+    def update(self, e):
+        # Update buffered input and output signals
+        self.e = [e]+self.e[:len(self.e)-1]
+        self.y = [0]+self.y[:len(self.y)-1]
+        # Shorten variable names for better readability
+        e = self.e
+        y = self.y
+        # Calculate output signal and return output
+        y[0] = ( e[0]*self.k4 + e[1]*self.k5 + e[2]*self.k6 - y[1]*self.k2 - y[2]*self.k3 )/self.k1
+        return y[0]
+
 class strategy4Controller:
     """ Models HEBI control strategy 4 using 3 PID controllers discretised using the tustin approximation """
     def __init__(self, ts=0) -> None:
@@ -121,7 +153,7 @@ class strategy4Controller:
         ]
         # Mimick damping of motor
         # https://docs.hebi.us/resources/x-series/freq_response/FreqResponse_X5-4.png
-        self.PWMFilter = PT1Block(kp=1, T1=0.1, ts=ts)
+        self.PWMFilter = PT2Block(kp=1, T=0.1, D=1, ts=ts)
     #
     def updateConstants(self, constants):
         """ Calculates constants in each PID controller """
@@ -158,14 +190,14 @@ class strategy4Controller:
         PWM1 = self.outputFilters[2].update(PWM1)
         print("Effort 5: {}".format(PWM1))
         PWM1 = clampValue(PWM1, outputConstraints[2])
-        print("Effort 5: {}".format(PWM1))
+        print("Effort 6: {}".format(PWM1))
         # Update Velocity PID (input = velocityIn - velocityFeedback) , apply output filtering and clamp output value
         PWM2 = self.VelocityPID.update(vecIn[1] - feedback[1])
         print("PWM2 1: {}".format(PWM2))
         PWM2 = self.outputFilters[1].update(PWM2)
-        print("PWM2 1: {}".format(PWM2))
+        print("PWM2 2: {}".format(PWM2))
         PWM2 = clampValue(PWM2, outputConstraints[1])
-        print("PWM2 1: {}".format(PWM2))
+        print("PWM2 3: {}".format(PWM2))
         # Return sum of PWM signals (PWM filter is applied here to mimick frequency response of the X5-4 motor)
         return self.PWMFilter.update(clampValue(PWM1 + PWM2, 1))
 
@@ -189,9 +221,9 @@ class bulletSim:
         self.robotID = p.loadURDF("SAImon.urdf")
         # Add damping to mimick motor inertia and friction #TODO: what units are used here in pybullet? Nm and Nm/rad?!
         # https://pybullet.org/Bullet/phpBB3/viewtopic.php?t=12685
-        p.changeDynamics(self.robotID,1,linearDamping=0.04, angularDamping=70)
-        p.changeDynamics(self.robotID,3,linearDamping=0.04, angularDamping=70)
-        p.changeDynamics(self.robotID,5,linearDamping=0.04, angularDamping=70)
+        #p.changeDynamics(self.robotID,1,linearDamping=0.04, angularDamping=70)
+        #p.changeDynamics(self.robotID,3,linearDamping=0.04, angularDamping=70)
+        #p.changeDynamics(self.robotID,5,linearDamping=0.04, angularDamping=700)
         #p.setJointMotorControl2(self.robotID,1,p.VELOCITY_CONTROL,targetVelocity=0,force=70)
         #p.setJointMotorControl2(self.robotID,3,p.VELOCITY_CONTROL,targetVelocity=0,force=70)
         #p.setJointMotorControl2(self.robotID,5,p.VELOCITY_CONTROL,targetVelocity=0,force=70)
@@ -223,25 +255,11 @@ class bulletSim:
         # Jointstate is formatted as a numpy array so we can easily drop the not needed force information
         return np.delete(jointState, 2, 1).astype(float)
     #
-    def applyFriction(self, torque, friction):
-        """ Applies friction (in Nm) to a torque (in Nm) """
-        # Make sure firction is positive
-        friction = abs(friction)
-        # If torque is smaller than friction, the joint does not move
-        if abs(torque) <= friction:
-            return 0
-        # If torque is smaller than 0, add friction (since friction takes effect in the opposite direction)
-        # Otherwise subtract friction
-        if torque < 0: return torque + friction
-        else: return torque - friction
-    #
-    def torqueControlUpdate(self, torques, friction=5):
+    def torqueControlUpdate(self, torques):
         """ Applies direct force to the robot joints """
         mode = p.TORQUE_CONTROL
-        # Simulate friction directly as part of the joint and apply torque to the robot
-        #torques = [ self.applyFriction(torque, friction) for torque in torques ]
-        p.setJointMotorControl2(self.robotID, 1, controlMode=mode, force=torques[0])
-        p.setJointMotorControl2(self.robotID, 3, controlMode=mode, force=torques[1])
+        #p.setJointMotorControl2(self.robotID, 1, controlMode=mode, force=torques[0])
+        #p.setJointMotorControl2(self.robotID, 3, controlMode=mode, force=torques[1])
         p.setJointMotorControl2(self.robotID, 5, controlMode=mode, force=torques[2])
         p.stepSimulation()
         jointState = np.array([
@@ -256,11 +274,10 @@ class bulletSim:
             [
                 jointState[:,0].astype(float),
                 jointState[:,1].astype(float),
-                #np.array([0,0,0], dtype=float)
-                np.array(torques, dtype=float)
+                np.array([0,0,0], dtype=float)
+                #np.array(torques, dtype=float)
             ]
         ).T
-        #return np.delete(jointState, 2, 1).astype(float)
 
 def PWM2Torque(PWM, maxMotorTorque=7.5):
     """ Converts PWM output signals of the strategy 4 controller to direct torque outputs (Nm) for Pybullet """
@@ -284,7 +301,7 @@ class simulatedRobot:
         # Instantiate robot with correct ts
         self.robot = bulletSim(ts=ts)
         # Deactivate the internal positional controller
-        feedback = self.robot.positionControlUpdate(cmdForce=[0,0,0])
+        feedback = self.robot.positionControlUpdate(cmdForce=[100,100,0], cmdPos=[0,-1.57,0])
         # Init Node and get controller params
         rospy.init_node("ControllerInterface")
         j1Params = rospy.get_param("jointcontrol/J1/Defaults")
@@ -316,8 +333,10 @@ class simulatedRobot:
             print(feedback)
             # Get torque vector from strategy 4 controller
             torqueVec = [
-                PWM2Torque(self.controllers[0].update(controlSignal[0], feedback[0])),
-                PWM2Torque(self.controllers[1].update(controlSignal[1], feedback[1])),
+                #PWM2Torque(self.controllers[0].update(controlSignal[0], feedback[0])),
+                #PWM2Torque(self.controllers[1].update(controlSignal[1], feedback[1])),
+                0,
+                0,
                 PWM2Torque(self.controllers[2].update(controlSignal[2], feedback[2]))
             ]
             print(torqueVec)
