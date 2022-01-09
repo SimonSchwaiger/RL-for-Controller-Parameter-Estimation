@@ -286,7 +286,7 @@ class bulletSim:
         """ Applies direct force to the robot joints """
         mode = p.TORQUE_CONTROL
         p.setJointMotorControl2(self.robotID, 1, controlMode=mode, force=torques[0])
-        #p.setJointMotorControl2(self.robotID, 3, controlMode=mode, force=torques[1])
+        p.setJointMotorControl2(self.robotID, 3, controlMode=mode, force=torques[1])
         p.setJointMotorControl2(self.robotID, 5, controlMode=mode, force=torques[2])
         p.stepSimulation()
         jointState = np.array([
@@ -318,7 +318,7 @@ class simulatedRobot:
         # Instantiate robot with correct ts
         self.robot = bulletSim(ts=ts)
         # Deactivate the internal positional controller
-        feedback = self.robot.positionControlUpdate(cmdForce=[0,100,0], cmdPos=[0,-1.57,0])
+        feedback = self.robot.positionControlUpdate(cmdForce=[0.5,0.5,0.5], cmdPos=[0,-1.57,0])
         # Init Node and get controller params
         rospy.init_node("ControllerInterface")
         j1Params = rospy.get_param("jointcontrol/J1/Defaults")
@@ -350,13 +350,14 @@ class simulatedRobot:
             #print(feedback)
             # Get torque vector from strategy 4 controller
             torqueVec = [
-                PWM2Torque(self.controllers[0].update(controlSignal[0], feedback[0])), 0,
-                #PWM2Torque(self.controllers[1].update(controlSignal[1], feedback[1])),
+                PWM2Torque(self.controllers[0].update(controlSignal[0], feedback[0])),
+                PWM2Torque(self.controllers[1].update(controlSignal[1], feedback[1])),
                 PWM2Torque(self.controllers[2].update(controlSignal[2], feedback[2]))
             ]
             print("Applied Torque: {}".format(torqueVec))
             # Apply torque to simulated robot
             feedback = self.robot.torqueControlUpdate(torqueVec)
+            print("Joint Positions: {}".format(feedback.T[0]))
             # Sleep for ts for a discrete real-time simulation
             self.looprate.sleep()
     #
@@ -396,7 +397,7 @@ jspub = rospy.Publisher("jointcontroller/jointstateTarget", JointState, queue_si
 
 js = JointState()
 js.name = ['J1', 'J2', 'J3']
-js.position = [1.57,-1.57,1.57]
+js.position = [1.57,0,1.57]
 js.velocity = [0,0,0]
 js.effort = [0,0,0]
 
