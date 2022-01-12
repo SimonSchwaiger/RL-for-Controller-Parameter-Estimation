@@ -126,6 +126,13 @@ class PT2Block:
         y[0] = ( e[0]*self.k4 + e[1]*self.k5 + e[2]*self.k6 - y[1]*self.k2 - y[2]*self.k3 )/self.k1
         return y[0]
 
+def PWM2Torque(PWM, maxMotorTorque=7.5):
+    """ Converts PWM output signals of the strategy 4 controller to direct torque outputs (Nm) for Pybullet """
+    # PWM range -> [-1, 1], Since we have X5-4 motors, the max torque is 7.5 Nm
+    # We just assume the conversion to be linear, might be fancier if I have time to measure a more exact conversion
+    # Source: https://docs.hebi.us/core_concepts.html#control-strategies
+    return PWM*maxMotorTorque
+
 class strategy4Controller:
     """ Models HEBI control strategy 4 using 3 PID controllers discretised using the tustin approximation """
     def __init__(self, ts=0) -> None:
@@ -147,13 +154,13 @@ class strategy4Controller:
             PT1Block(kp=1, T1=0, ts=ts)
         ]
         self.outputFilters = [
-            PT1Block(kp=1, T1=0,    ts=ts),
-            PT1Block(kp=1, T1=0.75, ts=ts),
-            PT1Block(kp=1, T1=0.9,  ts=ts)
+            PT1Block(kp=1, T1=0, ts=ts),
+            PT1Block(kp=1, T1=0, ts=ts), #0.9 #TODO: how does the 0-1 unit thing work?
+            PT1Block(kp=1, T1=0, ts=ts)  #0,75
         ]
         # Mimick damping of motor
         # https://docs.hebi.us/resources/x-series/freq_response/FreqResponse_X5-4.png
-        self.PWMFilter = PT2Block(kp=1, T=0.1, D=1, ts=ts)
+        self.PWMFilter = PT2Block(kp=1, T=0, D=5, ts=ts) # TODO: must be disabled for everything to work
     #
     def updateConstants(self, constants):
         """ Calculates constants in each PID controller """
@@ -199,7 +206,9 @@ class strategy4Controller:
         PWM2 = clampValue(PWM2, outputConstraints[1])
         print("PWM2 3: {}".format(PWM2))
         # Return sum of PWM signals (PWM filter is applied here to mimick frequency response of the X5-4 motor)
-        return self.PWMFilter.update(clampValue(PWM1 + PWM2, 1))
+        tmp =  self.PWMFilter.update(clampValue(PWM1 + PWM2, 1))
+        print("PWM Sum: {} Output Signal after PT2: {}".format(PWM2+PWM1, tmp))
+        return tmp
 
 class bulletSim:
     """ Class that instantiates a simulated robot using Pybullet """
@@ -279,19 +288,13 @@ class bulletSim:
             ]
         ).T
 
-def PWM2Torque(PWM, maxMotorTorque=7.5):
-    """ Converts PWM output signals of the strategy 4 controller to direct torque outputs (Nm) for Pybullet """
-    # PWM range -> [-1, 1], Since we have X5-4 motors, the max torque is 7.5 Nm
-    # Source: https://docs.hebi.us/core_concepts.html#control-strategies
-    return PWM*maxMotorTorque
-
 def deserialiseJointstate(js):
     """ Converts Jointstate message into the format used for the strategy 4 controller """
     return [ [pos, vel, eff] for pos, vel, eff in zip(js.position, js.velocity, js.effort) ]
 
 class simulatedRobot:
     """ ... """
-    def __init__(self, ts=1/60) -> None:
+    def __init__(self, ts=1/100) -> None:
         # Instantiate controllers and simulated robot
         self.controllers = [
             strategy4Controller(ts=ts),
@@ -329,8 +332,8 @@ class simulatedRobot:
         while not rospy.is_shutdown():
             # Get control signal in a per joint format from the target jointstate
             controlSignal = deserialiseJointstate(self.targetJS) # 3x3
-            print(controlSignal)
-            print(feedback)
+            #print(controlSignal)
+            #print(feedback)
             # Get torque vector from strategy 4 controller
             torqueVec = [
                 #PWM2Torque(self.controllers[0].update(controlSignal[0], feedback[0])),
@@ -339,7 +342,7 @@ class simulatedRobot:
                 0,
                 PWM2Torque(self.controllers[2].update(controlSignal[2], feedback[2]))
             ]
-            print(torqueVec)
+            print("Applied Torque: {}".format(torqueVec))
             # Apply torque to simulated robot
             feedback = self.robot.torqueControlUpdate(torqueVec)
             # Sleep for ts for a discrete real-time simulation

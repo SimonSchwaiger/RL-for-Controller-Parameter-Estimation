@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 
 # Pybullet components
+#from posixpath import join
 import pybullet as p
 import pybullet_data
 
 # ROS Components
 import rospy
+#from std_msgs.msg import Float32
 from sensor_msgs.msg import JointState
-from jointcontrol.msg import jointMetric
+#from jointcontrol.msg import jointMetric
 
 import numpy as np
 import time
@@ -306,6 +308,25 @@ class bulletSim:
             ]
         ).T
 
+#class controlmetricTracker:
+#    """ Tracks simulated controller performance and publishes it to the jointcontroller/jointMetric topic """
+#    def __init__(self) -> None:
+#        # Register publisher
+#        self.metricPub = rospy.Publisher(
+#            "jointcontroller/jointMetric",
+#            jointMetric,
+#            queue_size=1
+#        )
+#    #
+#    def updateMetrics(self, targets, feedbacks):
+#        """ Publishes a vector of target and feedback positions to be analysed by the gym environment """
+#        self.metricPub.publish(
+#            jointMetric(
+#                [ Float32(t) for t in targets ],
+#                [ Float32(f) for f in feedbacks ]
+#            )
+#        )
+
 class simulatedRobot:
     """ ... """
     def __init__(self, ts=1/100) -> None:
@@ -317,8 +338,6 @@ class simulatedRobot:
         ]
         # Instantiate robot with correct ts
         self.robot = bulletSim(ts=ts)
-        # Deactivate the internal positional controller
-        feedback = self.robot.positionControlUpdate(cmdForce=[0.5,0.5,0.5], cmdPos=[0,-1.57,0])
         # Init Node and get controller params
         rospy.init_node("ControllerInterface")
         j1Params = rospy.get_param("jointcontrol/J1/Defaults")
@@ -338,41 +357,77 @@ class simulatedRobot:
         )
         # Set up rospy loop frequency
         self.looprate = rospy.Rate(1/ts)
+        # Deactivate the internal positional controller
+        self.feedback = self.robot.positionControlUpdate(cmdForce=[0.5,0.5,0.5], cmdPos=[0,-1.57,0])
         # Wait for everything to register
         time.sleep(4)
         # Wait for target jointstate to exist
         while(self.targetJS == None): time.sleep(1)
-        # Start control loop
-        while not rospy.is_shutdown():
-            # Get control signal in a per joint format from the target jointstate
-            controlSignal = deserialiseJointstate(self.targetJS) # 3x3
-            #print(controlSignal)
-            #print(feedback)
-            # Get torque vector from strategy 4 controller
-            torqueVec = [
-                PWM2Torque(self.controllers[0].update(controlSignal[0], feedback[0])),
-                PWM2Torque(self.controllers[1].update(controlSignal[1], feedback[1])),
-                PWM2Torque(self.controllers[2].update(controlSignal[2], feedback[2]))
-            ]
-            print("Applied Torque: {}".format(torqueVec))
-            # Apply torque to simulated robot
-            feedback = self.robot.torqueControlUpdate(torqueVec)
-            print("Joint Positions: {}".format(feedback.T[0]))
-            # Sleep for ts for a discrete real-time simulation
-            self.looprate.sleep()
     #
     def jointStateTargetCallback(self, js):
         self.targetJS = js
     #
-    def updateControlParams(self, j1Params, j2Params, j3Params):
-        """ Sets params for each controller """
+    def updateControlParams(self, j1Params=None, j2Params=None, j3Params=None):
+        """ Sets params for each controller. If they are not provided as args, the params are loaded from ros """
+        if j1Params != None: j1Params = rospy.get_param("jointcontrol/J1/Defaults")
+        if j2Params != None: j2Params = rospy.get_param("jointcontrol/J2/Defaults")
+        if j3Params != None: j3Params = rospy.get_param("jointcontrol/J3/Defaults")
         self.controllers[0].updateConstants(j1Params)
         self.controllers[1].updateConstants(j2Params)
         self.controllers[2].updateConstants(j3Params)
+    #
+    def updateControlLoop(self, realtime=False):
+        # Get control signal in a per joint format from the target jointstate
+        controlSignal = deserialiseJointstate(self.targetJS) # 3x3
+        # Get torque vector from strategy 4 controller
+        torqueVec = [
+            PWM2Torque(self.controllers[0].update(controlSignal[0], self.feedback[0])),
+            PWM2Torque(self.controllers[1].update(controlSignal[1], self.feedback[1])),
+            PWM2Torque(self.controllers[2].update(controlSignal[2], self.feedback[2]))
+        ]
+        print("Applied Torque: {}".format(torqueVec))
+        # Apply torque to simulated robot
+        self.feedback = self.robot.torqueControlUpdate(torqueVec)
+        print("Joint Positions: {}".format(self.feedback.T[0]))
+        # Publish control metrics
+        #self.tracker.updateMetrics(controlSignal, self.feedback)
+        # Sleep for ts for a discrete real-time simulation
+        if realtime: self.looprate.sleep()
+        # Return jointmetrics for calculation of reward
+        return controlSignal, self.feedback
+
+class jointController:
+    """ ... """
+    def __init__(self) -> None:
+        self.sim = simulatedRobot()
+
+        
+
+
 
 if __name__ == "__main__":
     sim = simulatedRobot()
+    # Start control loop
+    while not rospy.is_shutdown():
+        _, _ = sim.updateControlLoop(realtime=True)
 
+    # Testee:
+        # Recieves:
+            # Initial Pose
+            # Controller Params (list of floats with length od numParams)
+            # Control Signal (list of floats with length ts*simTime)
+        # Returns:
+            # MSE of control signal - feedback
+
+
+
+class testee:
+    """ ... """
+    def __init__(self) -> None:
+        pass
+    #
+    def update(initialPose=None, controllerParams=None, controlSignal=None):
+        pass 
 
 
 """
@@ -397,7 +452,19 @@ jspub = rospy.Publisher("jointcontroller/jointstateTarget", JointState, queue_si
 
 js = JointState()
 js.name = ['J1', 'J2', 'J3']
-js.position = [1.57,0,1.57]
+js.position = [1.57,-1.57,1.57]
+js.velocity = [0,0,0]
+js.effort = [0,0,0]
+
+jspub.publish(js)
+
+
+
+
+
+js = JointState()
+js.name = ['J1', 'J2', 'J3']
+js.position = [-1.57,0,1.57]
 js.velocity = [0,0,0]
 js.effort = [0,0,0]
 

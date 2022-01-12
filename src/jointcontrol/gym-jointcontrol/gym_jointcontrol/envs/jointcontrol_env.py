@@ -3,12 +3,13 @@ from gym import spaces, logger
 from gym.utils import seeding
 
 import time
-
 import numpy as np
 
 import rospy
 
-from jointcontrol.msg import jointMetric
+from jointControllerRefactor import simServer
+
+#from jointcontrol.msg import jointMetric
 
 """
 Joint Environment is set up on a per joint basis
@@ -47,46 +48,43 @@ TODO:
 
 """
 
-class metricsTracker():
-    """
-    Subscribes to the jointcontroller/jointMetric/J.. topic in order to retrieve control signal and 
-    controller feedback for a certain point in time. Messages are sent in form of jointcontrol/jointMetric.msg.
-    """
-    """ Tracks performance metrics of a joint for use in the environment """
-    def __init__(self, jointID):
-        """ Class constructor """
-        self.jointID = jointID      # Index to identify the controlled joint
-        self.updateCount = 0        # Amount of updates since metrics were last checked
-        self.runningError = 0       # Difference between control signal and jointfeedback
-        
-        # Set up and register joint callback
-        self.metricSub = rospy.Subscriber(
-            "jointcontroller/jointMetric/J{}".format(jointID),
-            jointMetric, 
-            self.jointMetricCallback
-        )
+#class metricsTracker():
+#    """
+#    Subscribes to the jointcontroller/jointMetric/J.. topic in order to retrieve control signal and 
+#    controller feedback for a certain point in time. Messages are sent in form of jointcontrol/jointMetric.msg.
+#    """
+#    """ Tracks performance metrics of a joint for use in the environment """
+#    def __init__(self, jointID):
+#        """ Class constructor """
+#        self.jointID = jointID      # Index to identify the controlled joint
+#        self.updateCount = 0        # Amount of updates since metrics were last checked
+#        self.runningError = 0       # Difference between control signal and jointfeedback
+#        
+#        # Set up and register joint callback
+#        self.metricSub = rospy.Subscriber(
+#            "jointcontroller/jointMetric/J{}".format(jointID),
+#            jointMetric, 
+#            self.jointMetricCallback
+#        )
 
-    def jointMetricCallback(self, data):
-        """ Receives jointmetric message, calculates squared error and keeps track of the amount of messages received """
-        # Check if data is meant for this channel (for Debugging)
-        if data.name != self.jointID: 
-            rospy.logerr("J{} received a message not meant for this channel.")
-            return
-        # Add squared difference between control signal and joint feedback
-        self.runningError += (data.controlSignal-data.feedbackSignal)**2
-        # Increment update count
-        self.updateCount += 1
+#    def jointMetricCallback(self, data):
+#        """ Receives jointmetric message, calculates squared error and keeps track of the amount of messages received """
+#        # Add squared difference between control signal and joint feedback
+#        #TODO: experiment with other loss functions
+#        self.runningError += (data.targets[self.jointID] - data.feedbacks[self.jointID])**2
+#        # Increment update count
+#        self.updateCount += 1
 
-    def getAverageError(self):
-        """ Getter for the average error since last update """
-        # Make sure update count is nonzero
-        if self.updateCount == 0: return None
-        # Calculate squared error
-        avg =  round(self.runningError/self.updateCount, 8)
-        # Reset running error and updatecount
-        self.runningError = 0
-        self.updateCount = 0
-        return avg
+#    def getAverageError(self):
+#        """ Getter for the average error since last update """
+#        # Make sure update count is nonzero
+#        if self.updateCount == 0: return None
+#        # Calculate squared error
+#        avg =  round(self.runningError/self.updateCount, 8)
+#        # Reset running error and updatecount
+#        self.runningError = 0
+#        self.updateCount = 0
+#        return avg
 
 class jointcontrol_env(gym.Env):
     """
@@ -129,7 +127,7 @@ class jointcontrol_env(gym.Env):
         )
 
         self.action_space = spaces.Box(
-            np.array([ 0 for i in self.controllerParams["MaxChange"] ]),
+            np.array([ -i for i in self.controllerParams["MaxChange"] ]),
             np.array(self.controllerParams["MaxChange"])
         )
 
@@ -138,20 +136,38 @@ class jointcontrol_env(gym.Env):
         self.currentParams = self.controllerParams["Defaults"]
 
         # Instantiate metrics tracker
-        self.tracker = metricsTracker(self.jointidx)
+        #self.tracker = metricsTracker(self.jointidx)
 
         # Wait for messages to come in and clear initial output
         time.sleep(5)
-        while self.tracker.getAverageError() == None:
-            rospy.logwarn("J{} has not received jointmetric data on startup".format(self.jointidx))
-            time.sleep(2)
-
-        #TODO: wait for metrics to come in before proceeding
+        #while self.tracker.getAverageError() == None:
+        #    rospy.logwarn("J{} has not received jointmetric data on startup".format(self.jointidx))
+        #    time.sleep(2)
 
     def reset(self):
+        # Load default params and send them to ros param server
+        rospy.set_param(
+            "jointcontrol/J{}/Params".format(self.jointidx),
+            self.controllerParams["Defaults"]
+        )
+        # Reset squared mean error in tracker
+        #_ = self.tracker.getAverageError()
+        # Return params
+        return self.controllerParams["Defaults"]
+
         pass
     
     def step(self, action):
+        # Set desired controller params
+
+        # Publish target jointstate
+
+        # Update Control Loop for set amount of times
+
+        # Wait for sync signal of jointcontroller
+
+        # Return MSE of control error
+        
         pass
 
     def render(self, mode="human"):
