@@ -8,6 +8,8 @@
             "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
             "Maximums": [30, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
             "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+            "RobotID": 0,
+            "BodyID": 0,
             "ParamDescription": "PID PID PID"
         },
         {
@@ -28,5 +30,18 @@
             "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
             "ParamDescription": "PID PID PID"          
         }
-    ]
+    ],
+    "SimParams": {
+        "JointLinearDamping":     0.04,
+        "JointAangularDamping":     70,
+        "Ts":                     0.01,
+        "NumRobots":                 1,
+        "JointsPerRobot":            3,
+        "IdsWithinRobot":    [1, 3, 5],
+        "Realtime":            "False",
+        "StationSize":          [3, 3],
+        "StationsPerCol":            3,
+        "URDFName":        "test.urdf",
+        "URDFPath":             "/tmp"
+    }
 }

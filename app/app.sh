@@ -5,15 +5,13 @@ source /opt/ros/noetic/setup.bash
 source /catkin_ws/devel/setup.bash
 
 ## GYM &  PlaidML Setup
-
 # install gym envs
-pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
+#pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
 pip3 install -e /catkin_ws/src/jointcontrol/gym-jointcontrol
 # initiate plaidml
 #plaidml-setup
 
 ## ROS Setup
-
 # Start roscore
 roscore &
 
@@ -26,8 +24,16 @@ cd /app
 # Load controller configuration as ROS parameters
 python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcontrol)/config/saimonConfig.json
 
+## Start shared memory physics server
+# Headless
+#/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory &
+# With GUI
+/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory_GUI &
+
+bash
+
 # Start simulated Robot
-python jointController.py &
+#python jointControllerRefactor.py &
 
 #python
 
@@ -42,6 +48,6 @@ python jointController.py &
 #sleep 5
 #python #pyBulletTest.py
 
-python
+
 
 
