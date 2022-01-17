@@ -15,7 +15,7 @@
   </joint>
   <xacro:bracket type="X5HeavyLeftInside" name="shoulder_bracket" child="Arm/J2"/>
   <xacro:actuator type="X5_9" name="Arm/J2" child="shoulder_elbow"/>
-  <xacro:link type="X5" extension="0.175" twist="3.1415" name="shoulder_elbow" child="TCP/INPUT_INTERFACE"/>
+  <xacro:link_nocap type="X5" extension="0.175" twist="3.1415" name="shoulder_elbow" child="TCP"/>
 
   <link name="TCP/INPUT_INTERFACE">
   </link>

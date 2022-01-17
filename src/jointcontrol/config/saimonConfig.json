@@ -28,16 +28,17 @@
         "ParamDescription": "PID PID PID"  
     },
     "SimParams": {
-        "JointLinearDamping":     0.04,
-        "JointAangularDamping":     70,
-        "Ts":                     0.01,
-        "NumRobots":                 1,
-        "JointsPerRobot":            3,
-        "IdsWithinRobot":    [1, 3, 5],
-        "Realtime":            "False",
-        "StationSize":          [3, 3],
-        "StationsPerCol":            3,
-        "URDFName":        "test.urdf",
-        "URDFPath":             "/tmp"
+        "JointLinearDamping": [0.04, 0.04, 0.04],
+        "JointAangularDamping":     [70, 70, 70],
+        "JointTorques":           [7.5, 17, 7.5],
+        "Ts":                               0.01,
+        "NumRobots":                           1,
+        "JointsPerRobot":                      3,
+        "IdsWithinRobot":              [1, 3, 5],
+        "Realtime":                      "False",
+        "StationSize":                    [3, 3],
+        "StationsPerCol":                      3,
+        "URDFName":                "SAImon.urdf",
+        "URDFPath":      "/src/jointcontrol/urdf"
     }
 }

@@ -1,0 +1,93 @@
+{
+    "ParamNamespace": "jointcontrol",
+    "NumJoints": 9,
+    "J1": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "RobotID": 0,
+        "BodyID": 0,
+        "ParamDescription": "PID PID PID"
+    },
+    "J2": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },
+    "J3": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },
+    "J4": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },
+    "J5": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },   
+    "J6": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },   
+    "J7": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },   
+    "J8": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },   
+    "J9": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
+        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"  
+    },          
+    "SimParams": {
+        "JointLinearDamping":                     [0.04],
+        "JointAngularDamping":                      [70],
+        "JointTorques":                             [17],
+        "Ts":                                       0.01,
+        "NumRobots":                                   9,
+        "JointsPerRobot":                              1,
+        "IdsWithinRobot":                            [2],
+        "Realtime":                              "False",
+        "StationSize":                            [1, 1],
+        "StationsPerCol":                              3,
+        "URDFName":             "TrainingTestbench.urdf",
+        "URDFPath":    "/catkin_ws/src/jointcontrol/urdf"
+    }
+}
+
