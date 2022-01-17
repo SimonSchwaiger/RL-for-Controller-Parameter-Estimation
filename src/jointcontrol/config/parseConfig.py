@@ -1,47 +1,41 @@
-#!/env/bin/python
+#!/usr/bin/env python
 
 import json
 import sys
 import rospy
 
 if __name__ == "__main__":
-    def setParameter(param_name, param_value):
-        rospy.set_param(param_name, param_value)
+    def setParameter(param_name, param_value, namespace):
+        """ Sets a ros parameter in a given namespace """
+        rospy.set_param("/{}/{}".format(namespace, param_name), param_value)
+
+    def parseDict(dictData, namespace):
+        """ Iterates over a dict and replicates it on the ROS parameter server """
+        # Iterate over the keys and store params
+        # If an entry is a dict itself, iterate over it as well
+        for key in dictData:
+            if key == "ParamNamespace":
+                continue
+            entry = dictData[key]
+            if isinstance(entry, dict):
+                parseDict(entry, "{}/{}".format(namespace, key))
+            else:
+                setParameter(key, entry, namespace)
 
     # Make sure path to config file was given
-    assert len(sys.argv)>=1, "No path to Gains Config File was given!"
+    assert len(sys.argv)>=1, "No path to Config File was given!"
 
     # Get path to config file
     path = str(sys.argv[1])
-    print("Jointcontrol config path is {}".format(path))
+    print("Config path is {}".format(path))
 
-    # Read configuration file containing jointcontroller data
+    # Read configuration file containing data
     with open(path) as json_file:
         jsonData = json.load(json_file)
 
-    # Check if the specified numbers of joints are actually included
-    assert len(jsonData["Joints"])==jsonData["NumJoints"], "Wrong number of joints specified"
+    # Get namespace
+    namespace = jsonData["ParamNamespace"]
 
-    # Add number of joints as parameter
-    setParameter("/jointcontrol/NumJoints", jsonData["NumJoints"])
-
-    # Parse joint dict and create ros parameters
-    for j in range(jsonData["NumJoints"]):
-        entry = jsonData["Joints"][j]
-        # Check if entry is formatted correctly
-        assert len(entry["Defaults"])==entry["NumParams"], "Wrong number of given Defaults for ".format(entry["Name"])
-        assert len(entry["Minimums"])==entry["NumParams"], "Wrong number of given Minimums for ".format(entry["Name"])
-        assert len(entry["Maximums"])==entry["NumParams"], "Wrong number of given Maximums for ".format(entry["Name"])
-        assert len(entry["MaxChange"])==entry["NumParams"], "Wrong number of given MaxChange values for ".format(entry["Name"])
-
-        # Set up path of current parameter
-        name = "/jointcontrol/{}".format(entry["Name"])
-        # Add everey key as ROS parameter
-        for key in entry:
-            setParameter("{}/{}".format(name, key), entry[key])
-
-
-
-
-
+    # Parse dict and add entries to ros parameter server
+    parseDict(jsonData, namespace)
 

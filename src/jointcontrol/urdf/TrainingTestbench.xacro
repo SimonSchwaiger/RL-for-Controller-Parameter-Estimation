@@ -1,0 +1,26 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="SAImon">
+  <!-- Hebi X5_9 inverse pendulum testbench  -->
+  <xacro:include filename="$(find hebi_description)/urdf/hebi.xacro"/>
+  <xacro:include filename="$(find saimon)/urdf/link_nocap.xacro"/>
+  <xacro:arg name="hebi_base_frame" default="world"/>
+  <xacro:property name="hebi_base_frame" value="$(arg hebi_base_frame)"/>
+  <xacro:if value="${hebi_base_frame == 'world'}">
+    <link name="$(arg hebi_base_frame)"/>
+  </xacro:if>
+  <joint name="$(arg hebi_base_frame)_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <parent link="$(arg hebi_base_frame)"/>
+    <child link="shoulder_bracket/INPUT_INTERFACE"/>
+  </joint>
+  <xacro:bracket type="X5HeavyLeftInside" name="shoulder_bracket" child="Arm/J2"/>
+  <xacro:actuator type="X5_9" name="Arm/J2" child="shoulder_elbow"/>
+  <xacro:link type="X5" extension="0.175" twist="3.1415" name="shoulder_elbow" child="TCP/INPUT_INTERFACE"/>
+
+  <link name="TCP/INPUT_INTERFACE">
+  </link>
+  
+  <gazebo reference="base">
+     <selfCollide>true</selfCollide>
+  </gazebo>
+</robot>
