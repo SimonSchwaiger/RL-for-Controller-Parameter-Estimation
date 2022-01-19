@@ -1,8 +1,11 @@
+numpy
+sympy
+scipy
+hebi-py
+gym
 scikit-learn
 matplotlib
-pandas
-plaidml-keras
-h5py==2.10.0
+stable-baselines[mpi]
+tensorflow==1.15
+matplotlib
 pybullet
-sympy
-hebi-py

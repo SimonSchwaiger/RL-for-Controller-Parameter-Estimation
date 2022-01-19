@@ -9,6 +9,7 @@ if [ ! -d  "ros-ml-container" ]; then
     cd ros-ml-container/src
     git clone https://github.com/TW-Robotics/RL-with-3DOF-Robots
     git clone https://github.com/HebiRobotics/hebi_description
+    git clone https://github.com/ros-infrastructure/rosdoc_lite
     cd ../..
     cd app
     git clone https://github.com/HebiRobotics/hebi_description
@@ -27,5 +28,6 @@ cp -r src/. ros-ml-container/src/
 cp requirements.txt ros-ml-container/requirements.txt
 
 # Start container
+# Port 6006 is forwarded to allow for the tensorboard gui to be displayed on the host
 cd ros-ml-container
-GRAPHICS_PLATFORM=$GRAPHICS_PLATFORM ./buildandrun.sh
+GRAPHICS_PLATFORM=$GRAPHICS_PLATFORM PYTHONVER=3.7 DOCKER_RUN_ARGS="-p 6006:6006" ./buildandrun.sh

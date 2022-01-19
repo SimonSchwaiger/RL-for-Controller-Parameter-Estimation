@@ -34,6 +34,15 @@ def from_s(idx, a):
     y = idx%a
     return x, y
 
+def bringToSameLength(list1, list2):
+    """ Matches length of two lists. If one is shorter than the other, it will be extended with the contents of the other array """
+    #https://stackoverflow.com/questions/29972836/numpy-how-to-resize-an-random-array-using-another-array-as-template
+    if len(list1) < len(list2):
+        list1[len(list1):len(list2)]=list2[len(list1):]
+    elif len(list2) < len(list1):
+        list2[len(list2):len(list1)]=list1[len(list2):]
+    return list1, list2
+
 class bulletInstance:
     """ Manages workers and instantiates bullet simulation """
     def __init__(self, realtime=False, ts=None) -> None:
@@ -109,10 +118,14 @@ class bulletInstance:
     def update(self, readyArr):
         """ Checks which envs are ready for a sim step. If all are ready, a step is called """
         # Update which envs were marked as ready in message
-        readyEnvs = [
-            a or b
-            for a, b in zip(readyArr, self.readyEnvs)
-        ]
+        if self.readyEnvs != None:
+            readyArr, self.readyEnvs = bringToSameLength(readyArr, self.readyEnvs)
+            readyEnvs = [
+                a or b
+                for a, b in zip(readyArr, self.readyEnvs)
+            ]
+        else:
+            readyEnvs = readyArr
         # Check if all envs are ready 
         if all(readyEnvs):
             # If they are, step simulation and reset the variable
@@ -140,16 +153,16 @@ class ROSWrapper:
         joints = self.sim.createJoints(params["SimParams"])
         for idx, j in enumerate(joints):
             rospy.set_param(
-                "/jointcontrol/J{}/RobotID".format(idx), j[0]
+                "/jointcontrol/J{}/RobotID".format(idx+1), j[0]
             )
             rospy.set_param(
-                "/jointcontrol/J{}/SegmentID".format(idx), j[1]
+                "/jointcontrol/J{}/SegmentID".format(idx+1), j[1]
             )
         # Subscribe to synchronisation message and check in callback whether or not to perform a simulation step
         rospy.init_node("BulletSimServer")
         self.syncSub = rospy.Subscriber("jointcontrol/envSync", jointMetric, self.syncCallback)
         # Register publisher to the synchronisation message
-        self.syncPub = rospy.Publisher("jointcontrol/envSync", jointMetric, queue_size = params["NumJoints"])
+        self.syncPub = rospy.Publisher("jointcontrol/globalEnvSync", jointMetric, queue_size = 0)
         # Wait for everything to register
         time.sleep(2)
     #
@@ -158,13 +171,14 @@ class ROSWrapper:
         if self.sim.update(data.ready):
             # If update was perfored, publish the synchronisation message in order to signal to the envs that the sim step is ready
             self.syncPub.publish(
-                jointMetric( [ False for _ in range(self.NumJoints) ] )
+                jointMetric( [ False for _ in data.ready ] )
             )
 
 if __name__ == "__main__":
     wrap = ROSWrapper()
     rospy.spin()
-    
+
+
 
 #import rospy
 #from jointcontrol.msg import jointMetric

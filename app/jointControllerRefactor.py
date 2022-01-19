@@ -411,6 +411,15 @@ if __name__ == "__main__":
     while not rospy.is_shutdown():
         _, _ = sim.updateControlLoop(realtime=True)
 
+    # Joint Interface:
+        # .updateControlParams(params)
+            # Receives params (arr of length numParams),
+            # Returns None
+        # .updateControlLoop()
+            # Receives None
+            # Returns controlsignal, feedback
+
+
     # Testee:
         # Recieves:
             # Initial Pose
@@ -420,8 +429,7 @@ if __name__ == "__main__":
             # MSE of control signal - feedback
 
 
-
-class testee:
+class testServer:
     """ ... """
     def __init__(self) -> None:
         pass
