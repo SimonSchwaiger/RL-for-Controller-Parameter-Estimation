@@ -11,8 +11,7 @@ from jointcontrol.msg import jointMetric
 
 import pybullet as p
 
-#from controllers import *
-
+import matplotlib.pyplot as plt
 
 from sensor_msgs.msg import JointState
 
@@ -79,6 +78,7 @@ class PT1Block:
         return y[0]
 
 class DBlock:
+    """ Discrete D Block approximated using the Tustin approximation """
     def __init__(self, kd=0, ts=0, bufferLength=2) -> None:
         self.k = 0
         self.e = [0 for i in range(bufferLength)]
@@ -255,19 +255,20 @@ class jointcontrol_env(gym.Env):
         # Load joint controller configuration from ros parameter server
         assert rospy.has_param("/jointcontrol")
         params = rospy.get_param("/jointcontrol")
-        assert params["NumJoints"]>=self.jointidx
-        self.jointParams = params["J{}".format(self.jointidx+1)]
+        assert params["NumJoints"]>self.jointidx
+        self.jointParams = params["J{}".format(self.jointidx)]
 
-        # Define action space as box with + and - maximum change to each param
+        # Define action space as box[-1, 1] with the same length as the params
+        # Actions are scaled to the different gains, in order for the action noise distribution to be the same for every entry
         self.action_space = spaces.Box(
-            np.array([ -i for i in self.jointParams["MaxChange"] ]),
-            np.array(self.jointParams["MaxChange"])
+            np.array( [ -1 for _ in self.jointParams["MaxChange"] ], dtype=np.float32 ),
+            np.array( [ 1 for _ in self.jointParams["MaxChange"] ], dtype=np.float32 )
         )
 
         # Define observation space as box with minimum and maximum controller params
         self.observation_space = spaces.Box (
-            np.array(self.jointParams["Minimums"]),
-            np.array(self.jointParams["Maximums"])
+            np.array(self.jointParams["Minimums"], dtype=np.float32),
+            np.array(self.jointParams["Maximums"], dtype=np.float32)
         )
 
         # Instantiate controller as a blueprint to store ts and set params
@@ -279,20 +280,24 @@ class jointcontrol_env(gym.Env):
         self.controlSignal = None               # Control signal that is applied each step
         self.numSteps = 0                       # Number of performed steps this episode
         self.maxSteps = 0                       # Maximum number of steps per episode
+        self.latestTrajectory = None            # Stores the trajectory resulting from the latest sim step
 
         # Connect to the bullet server
         self.physicsClient = p.connect(p.SHARED_MEMORY)
 
         # Init ROS node
         try:
-            rospy.init_node("j{}GymEnv".format(self.jointidx+1))
+            rospy.init_node("j{}GymEnv".format(self.jointidx))
         except rospy.exceptions.ROSException:
             pass
 
         # Create ROS publisher & subscriber to synchronise with physics server
         self.ready = False
         self.syncSub = rospy.Subscriber("jointcontrol/globalEnvSync", jointMetric, self.syncCallback)
-        self.syncPub = rospy.Publisher("jointcontrol/envSync", jointMetric, queue_size = 0)
+        self.syncPub = rospy.Publisher("jointcontrol/envSync", jointMetric, queue_size = 1)
+
+    def __del__(self):
+        p.disconnect()
 
     # Gym Env methods
     # ----------------------------
@@ -300,19 +305,37 @@ class jointcontrol_env(gym.Env):
         """ Performs one simulation (as defined with episodeType and config params in env.reset()) """
 
         # If action is not within action space, terminate the episode and return
-        minChange = [ -i for i in self.jointParams["MaxChange"] ]
-        if False in [ a <= b <= c for a, b, c in zip(minChange, action, self.jointParams["MaxChange"]) ]:
+        if False in [ -1 <= a <= 1 for a in action ]:
             return self.formatObs(), -10, True, {} 
+
+        # Scale action from [-1, 1] back to params
+        action = np.multiply(
+            np.array(action), 
+            np.array(self.jointParams["MaxChange"], dtype=np.float64)
+        )
 
         # Calculate current controller params after action
         self.currentParams += np.array(action)
 
-        # If action put the state outside of the observation space, terminate episode and return
-        if False in [ a <= b <= c for a, b, c in zip(self.jointParams["Minimums"], self.currentParams, self.jointParams["Maximums"]) ]:
-            return self.formatObs(), -10, True, {} 
+        # If action puts the state outside of the observation space, terminate episode and return
+        #if False in [ a <= b <= c for a, b, c in zip(self.jointParams["Minimums"], self.currentParams, self.jointParams["Maximums"]) ]:
+        #    return self.formatObs(), -10, True, {} 
 
-        #TODO Set joint to initial position
+        # Clip controller params to Min/Max
+        np.clip(
+            self.currentParams,
+            self.jointParams["Minimums"],
+            self.jointParams["Maximums"],
+            out = self.currentParams
+        )
 
+        # Set joint to initial position
+        while abs( self.getJointState()[0] - self.controlSignal[0]) > 0.05:
+            self.positionControlUpdate(cmdForce=100, cmdPos=self.controlSignal[0])
+            self.waitForPhysicsUpdate()
+        # Deactivate position control before proceeding
+        self.positionControlUpdate()
+        self.waitForPhysicsUpdate()
 
         # Update controller instance
         self.controllerInstance.updateConstants(self.currentParams)
@@ -323,7 +346,7 @@ class jointcontrol_env(gym.Env):
         # Iterate over controlsignal
         for entry in self.controlSignal:
             # Calculate output torque and apply it to the joint
-            # We only perform position control here for now
+            # Since we only test postion control, the vel and effort commands are set to 0
             torque = PWM2Torque(
                 self.controllerInstance.update([entry, 0, 0], feedback),
                 maxMotorTorque=14
@@ -335,10 +358,13 @@ class jointcontrol_env(gym.Env):
             feedback = self.getJointState()
             feedback[2] = torque
             # Log feedback for reward calculation
-            resultingPos.appen(feedback[0])
+            resultingPos.append(feedback[0])
 
         # Calculate reward
         reward = self.compute_reard(resultingPos, self.controlSignal, {})
+
+        # Keep track of resulting trajectory
+        self.latestTrajectory = resultingPos
 
         # Check if end of episode is reached
         if self.numSteps < self.maxSteps:
@@ -350,7 +376,7 @@ class jointcontrol_env(gym.Env):
         # Return
         return self.formatObs(), reward, done, {}
 
-    def reset(self, episodeType='step', config={ "initialPos":0, "stepPos":1.57, "samplesPerStep":500, "maxSteps":100 }):
+    def reset(self, episodeType='step', config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":80, "maxSteps":40 }):
         """
         Resets environment and returns env observation 
         
@@ -358,10 +384,11 @@ class jointcontrol_env(gym.Env):
         """
         # Instantiate controller with default params
         self.controllerInstance = copy.deepcopy(self.controllerBlueprint)
-        self.currentParams = np.array(self.jointParams["Defaults"])
+        self.currentParams = np.array(self.jointParams["Defaults"], dtype=np.float64)
 
         # Create control signal and set number of performed steps to 0
         self.controlSignal = [config["initialPos"]] + [ config["stepPos"] for _ in range(config["samplesPerStep"]-1) ]
+        self.maxSteps = config["maxSteps"]
         self.numSteps = 0
 
         return self.formatObs()
@@ -369,9 +396,6 @@ class jointcontrol_env(gym.Env):
     def render(self, mode="human"):
         # No need to render, as it happens in ROS
         pass
-
-    def close(self):
-        p.disconnect()
     
     # Gym GoalEnv methods
     # ----------------------------
@@ -414,7 +438,7 @@ class jointcontrol_env(gym.Env):
     def loadBulletTarget(self):
         """ Reloads jointparams from ROS in order to enable changing of the testscene without terminating the env """
         params = rospy.get_param("/jointcontrol")
-        self.jointParams = params["J{}".format(self.jointidx+1)]
+        self.jointParams = params["J{}".format(self.jointidx)]
 
     def syncCallback(self, data):
         """ Callback for synchronisation message """
@@ -425,9 +449,24 @@ class jointcontrol_env(gym.Env):
         """ Synchronises env with physics server using ROS messages """
         # Publish message indicating that env is ready for sim step
         self.syncPub.publish(
-            jointMetric( [ False for _ in range(self.jointidx-1) ] + [ True ] )
+            jointMetric( [ False for _ in range(self.jointidx) ] + [ True ] )
         )
         self.ready = True
         while self.ready:
-            time.sleep(1/500)
+            time.sleep(1/400)
 
+    def visualiseTrajectory(self):
+        """ Plots control signal vs. resulting trajectory using matplotlib """
+        plt.plot(
+            [ i for i, _ in enumerate(self.controlSignal) ],
+            self.controlSignal,
+            label = "Control Signal"
+        )
+        if self.latestTrajectory != None:
+            plt.plot(
+                [ i for i, _ in enumerate(self.latestTrajectory) ],
+                self.latestTrajectory,
+                label = "Resulting Position"
+            )
+        plt.legend()
+        plt.show()

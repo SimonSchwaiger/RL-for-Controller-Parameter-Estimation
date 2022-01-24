@@ -45,7 +45,7 @@ def bringToSameLength(list1, list2):
 
 class bulletInstance:
     """ Manages workers and instantiates bullet simulation """
-    def __init__(self, realtime=False, ts=None) -> None:
+    def __init__(self, realtime=False, ts=None, spawnGroundplane=False) -> None:
         # Register physics client
         self.physicsClient = p.connect(p.SHARED_MEMORY)
         #
@@ -54,7 +54,8 @@ class bulletInstance:
         #
         # Set gravity and load groundplane
         p.setGravity(0,0,-9.8)
-        planeId = p.loadURDF("plane.urdf")
+        if spawnGroundplane == True:
+            planeId = p.loadURDF("plane.urdf")
         #
         p.setTimeStep(ts)
         #
@@ -110,8 +111,6 @@ class bulletInstance:
                     linearDamping = simParams["JointLinearDamping"][j], 
                     angularDamping = simParams["JointAngularDamping"][j]
                 )
-        # Create a list of bools of len(joints) in order to track which environments are ready for a sim step
-        self.readyEnvs = [ False for _ in joints ]
         # When the loop is done, return joint info to be stored in rosparam
         return joints
     #
@@ -138,6 +137,7 @@ class bulletInstance:
             return 0
 
 class ROSWrapper:
+    """ Wraps physics simulation helper class to the ROS param and msg services """
     def __init__(self) -> None:
         # Load jointcontrol params from rospy
         assert rospy.has_param("/jointcontrol")
@@ -153,16 +153,16 @@ class ROSWrapper:
         joints = self.sim.createJoints(params["SimParams"])
         for idx, j in enumerate(joints):
             rospy.set_param(
-                "/jointcontrol/J{}/RobotID".format(idx+1), j[0]
+                "/jointcontrol/J{}/RobotID".format(idx), j[0]
             )
             rospy.set_param(
-                "/jointcontrol/J{}/SegmentID".format(idx+1), j[1]
+                "/jointcontrol/J{}/SegmentID".format(idx), j[1]
             )
         # Subscribe to synchronisation message and check in callback whether or not to perform a simulation step
         rospy.init_node("BulletSimServer")
         self.syncSub = rospy.Subscriber("jointcontrol/envSync", jointMetric, self.syncCallback)
         # Register publisher to the synchronisation message
-        self.syncPub = rospy.Publisher("jointcontrol/globalEnvSync", jointMetric, queue_size = 0)
+        self.syncPub = rospy.Publisher("jointcontrol/globalEnvSync", jointMetric, queue_size = 1)
         # Wait for everything to register
         time.sleep(2)
     #

@@ -1,6 +1,14 @@
 {
     "ParamNamespace": "jointcontrol",
     "NumJoints": 9,
+    "J0": {
+        "NumParams": 9,
+        "Defaults": [10, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "ParamDescription": "PID PID PID"
+    },    
     "J1": {
         "NumParams": 9,
         "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
@@ -64,15 +72,7 @@
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
         "ParamDescription": "PID PID PID"  
-    },   
-    "J9": {
-        "NumParams": 9,
-        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
-        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
-        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
-        "ParamDescription": "PID PID PID"  
-    },          
+    },      
     "SimParams": {
         "JointLinearDamping":                     [0.04],
         "JointAngularDamping":                      [70],
