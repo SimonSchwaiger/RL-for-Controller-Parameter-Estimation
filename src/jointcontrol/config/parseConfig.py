@@ -5,6 +5,7 @@ import sys
 import rospy
 
 if __name__ == "__main__":
+    """ Parses json config file and uploads content to ros param server """
     def setParameter(param_name, param_value, namespace):
         """ Sets a ros parameter in a given namespace """
         rospy.set_param("/{}/{}".format(namespace, param_name), param_value)

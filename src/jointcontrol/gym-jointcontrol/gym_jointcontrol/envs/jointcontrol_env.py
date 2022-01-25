@@ -25,7 +25,7 @@ def clampValue(val, valMax):
     else: return val
 
 class PIDController:
-    """ Discrete PID controller approximated using the Tustin (trapezoid) approximation """
+    """!@brief Discrete PID controller approximated using the Tustin (trapezoid) approximation """
     def __init__(self, kp=0, ki=0, kd=0, ts=0, feedforward=0, bufferLength=3) -> None:
         #self.bufferLength = bufferLength
         self.k1 = 0
@@ -37,11 +37,18 @@ class PIDController:
         if ts != 0:  self.setConstants(kp, ki, kd, ts)
     #
     def setConstants(self, kp, ki, kd, ts):
+        """ Updates controller constants """
         self.k1 = kp+((ki*ts)/2)+((2*kd)/ts)
         self.k2 = ki*ts-((4*kd)/ts)
         self.k3 = (-1*kp)+((ki*ts)/2)+((2*kd)/ts)   
     #
     def update(self, e):
+        """
+        Performs one discrete controller update 
+        
+        Receives: Input signal [float]
+        Returns: Output signal [float]
+        """
         # Update buffered input and output signals
         self.e = [e]+self.e[:len(self.e)-1]
         self.y = [0]+self.y[:len(self.y)-1]
@@ -53,7 +60,7 @@ class PIDController:
         return y[0] + e[0]*self.feedforward
 
 class PT1Block:
-    """ Discrete PT1 block approximated using the Tustin (trapezoid) approximation """
+    """!@brief Discrete PT1 block approximated using the Tustin (trapezoid) approximation """
     def __init__(self, kp=1, T1=0, ts=0, bufferLength=2) -> None:
         self.k1 = 0
         self.k2 = 0
@@ -62,11 +69,18 @@ class PT1Block:
         if ts != 0: self.setConstants(kp, T1, ts)
     #
     def setConstants(self, kp, T1, ts):
+        """ Updates controller constants """
         t = 2*(T1/ts)
         self.k1 = kp/(1+t)
         self.k2 = (1-t)/(1+t)
     #
     def update(self, e):
+        """
+        Performs one discrete controller update 
+        
+        Receives: Input signal [float]
+        Returns: Output signal [float]
+        """        
         # Update buffered input and output signals
         self.e = [e]+self.e[:len(self.e)-1]
         self.y = [0]+self.y[:len(self.y)-1]
@@ -78,7 +92,7 @@ class PT1Block:
         return y[0]
 
 class DBlock:
-    """ Discrete D Block approximated using the Tustin approximation """
+    """!@brief Discrete D Block approximated using the Tustin approximation """
     def __init__(self, kd=0, ts=0, bufferLength=2) -> None:
         self.k = 0
         self.e = [0 for i in range(bufferLength)]
@@ -86,9 +100,16 @@ class DBlock:
         if ts != 0: self.setConstants(kd, ts)
     #
     def setConstants(self, kd, ts):
+        """ Updates controller constants """
         self.k = (2*kd)/ts
     #
     def update(self, e):
+        """
+        Performs one discrete controller update 
+        
+        Receives: Input signal [float]
+        Returns: Output signal [float]
+        """        
         if self.k == 0: return 0
         # Update buffered input and output signals
         self.e = [e]+self.e[:len(self.e)-1]
@@ -101,7 +122,7 @@ class DBlock:
         return y[0]
 
 class PT2Block:
-    """ Discrete PT2 Block approximated using the Tustin approximation """
+    """!@brief Discrete PT2 Block approximated using the Tustin approximation """
     def __init__(self, T=0, D=0, kp=1, ts=0, bufferLength=3) -> None:
         self.k1 = 0
         self.k2 = 0
@@ -114,6 +135,7 @@ class PT2Block:
         if ts != 0:  self.setConstants(T, D, kp, ts)
     #
     def setConstants(self, T, D, kp, ts):
+        """ Updates controller constants """
         self.k1 = 4*T**2 + 4*D*T*ts + ts**2
         self.k2 = 2*ts**2 - 8*T**2
         self.k3 = 4*T**2 - 4*D*T*ts + ts**2
@@ -122,6 +144,12 @@ class PT2Block:
         self.k6 = kp*ts**2
     #
     def update(self, e):
+        """
+        Performs one discrete controller update 
+        
+        Receives: Input signal [float]
+        Returns: Output signal [float]
+        """        
         # Update buffered input and output signals
         self.e = [e]+self.e[:len(self.e)-1]
         self.y = [0]+self.y[:len(self.y)-1]
@@ -133,7 +161,7 @@ class PT2Block:
         return y[0]
 
 class smartPID:
-    """ Implementation to mimick HEBI PID controller behaviour. Variable names are consistent with HEBI Gains format """
+    """!@brief Implementation to mimick HEBI PID controller behaviour. Variable names are consistent with HEBI Gains format """
     def __init__(self, kp=0, ki=0, kd=0, targetLP=0, outputLP=0, ts=0, feedforward=0, d_on_error=True, targetMax=None, outputMax=None) -> None:
         self.d_on_error = d_on_error
         if d_on_error:
@@ -153,6 +181,7 @@ class smartPID:
         self.feedforward = feedforward
     #
     def setConstants(self, kp, ki, kd, ts):
+        """ Updates controller constants """
         if self.d_on_error:
             self.PID.setConstants(kp, ki, kd, ts)
         else:
@@ -163,6 +192,12 @@ class smartPID:
         self.outputFilter = PT1Block(kp=1, T1=self.outputLP, ts=ts)
     #
     def update(self, target, feedback):
+        """
+        Performs one discrete controller update 
+        
+        Receives: Input signal [float]
+        Returns: Output signal [float]
+        """        
         # Clamp and low pass input
         filteredInput = self.inputFilter.update(
             clampValue(target, self.targetMax)
@@ -176,7 +211,7 @@ class smartPID:
         return output
         
 class strategy4Controller:
-    """ Models HEBI control strategy 4 using 3 PID controllers discretised using the tustin approximation """
+    """!@brief Models HEBI control strategy 4 using 3 PID controllers discretised using the tustin approximation """
     def __init__(self, ts=0, targetConstraints=[None, 3.43, 20], outputConstraints=[10, 1, 1], feedfowards=[0, 1, 1], d_on_errors=[True, True, False], constants=None) -> None:
         """ Class constructor """
         self.ts = ts
@@ -208,6 +243,7 @@ class strategy4Controller:
         if constants != None: self.updateConstants(constants)
     #
     def updateConstants(self, constants):
+        """ Updates controller constants """
         self.PositionPID.setConstants(constants[0], constants[1], constants[2], self.ts)
         self.VelocityPID.setConstants(constants[3], constants[4], constants[5], self.ts)
         self.EffortPID.setConstants(  constants[6], constants[7], constants[8], self.ts)
@@ -235,7 +271,7 @@ def deserialiseJointstate(js):
     return [ [pos, vel, eff] for pos, vel, eff in zip(js.position, js.velocity, js.effort) ]
 
 class jointcontrol_env(gym.Env):
-    """@brief Class implementing the control problem as a Gym Environment
+    """!@brief Class implementing the control problem as a Gym Environment
 
     Observation Space:
         List of currently set params
@@ -297,6 +333,7 @@ class jointcontrol_env(gym.Env):
         self.syncPub = rospy.Publisher("jointcontrol/envSync", jointMetric, queue_size = 1)
 
     def __del__(self):
+        """ Class Deconstructor """
         p.disconnect()
 
     # Gym Env methods
@@ -441,7 +478,7 @@ class jointcontrol_env(gym.Env):
         self.jointParams = params["J{}".format(self.jointidx)]
 
     def syncCallback(self, data):
-        """ Callback for synchronisation message """
+        """ Callback for synchronisation messages """
         if not True in data.ready:
             self.ready = False
 
