@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="SAImon">
   <!-- Hebi X5_9 inverse pendulum testbench  -->
   <xacro:include filename="$(find hebi_description)/urdf/hebi.xacro"/>
-  <xacro:include filename="$(find saimon)/urdf/link_nocap.xacro"/>
+  <xacro:include filename="$(find jointcontrol)/urdf/link_nocap.xacro"/>
   <xacro:arg name="hebi_base_frame" default="world"/>
   <xacro:property name="hebi_base_frame" value="$(arg hebi_base_frame)"/>
   <xacro:if value="${hebi_base_frame == 'world'}">
