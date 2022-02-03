@@ -5,7 +5,8 @@ hebi-py
 gym
 scikit-learn
 matplotlib
+seaborn
+pandas
 stable-baselines[mpi]
 tensorflow==1.15
-matplotlib
 pybullet

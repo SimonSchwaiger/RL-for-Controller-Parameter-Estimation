@@ -7,6 +7,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
         "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"
     },    
     "J1": {
@@ -15,6 +16,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"
     },
     "J2": {
@@ -23,6 +25,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },
     "J3": {
@@ -31,6 +34,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },
     "J4": {
@@ -39,6 +43,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },
     "J5": {
@@ -47,6 +52,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },   
     "J6": {
@@ -55,6 +61,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },   
     "J7": {
@@ -63,6 +70,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },   
     "J8": {
@@ -71,6 +79,7 @@
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
         "Maximums": [40, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
         "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"  
     },      
     "SimParams": {
@@ -84,7 +93,7 @@
         "Realtime":                              "False",
         "StationSize":                            [1, 1],
         "StationsPerCol":                              3,
-        "URDFName":             "TrainingTestbench.urdf",
+        "URDFName":             ["TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf", "TrainingTestbench.urdf"],
         "URDFPath":    "/catkin_ws/src/jointcontrol/urdf"
     }
 }

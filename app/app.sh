@@ -15,7 +15,6 @@ roscore &
 cd /catkin_ws/src/jointcontrol/urdf 
 rosrun xacro xacro -o SAImon.urdf SAImon.xacro
 rosrun xacro xacro -o TrainingTestbench.urdf TrainingTestbench.xacro
-#mv SAImon.urdf /app
 cd /app
 
 ## Load controller configuration as ROS parameters
@@ -26,17 +25,18 @@ python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcon
 #/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory &
 # With GUI
 /bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory_GUI &
+sleep 1
 
 ## Connect to the server, load robots and set up synchronisation between envs
-python physicsServer.py &
+python /catkin_ws/src/jointcontrol/scripts/physicsServer.py &
 # Wait until everything is loaded
 sleep 15
 
+# Output all set params
 rosparam list
-#bash
 
-# Start simulated Robot
-#python jointControllerRefactor.py &
+# Generate Doxygen Documentation
+# rosdoc_lite -o ./generatedDocumentation /catkin_ws/src/jointcontrol/
 
 python
 

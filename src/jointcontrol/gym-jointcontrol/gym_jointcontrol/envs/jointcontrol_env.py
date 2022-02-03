@@ -13,7 +13,7 @@ import pybullet as p
 
 import matplotlib.pyplot as plt
 
-from sensor_msgs.msg import JointState
+#from sensor_msgs.msg import JointState
 
 import numpy as np
 
@@ -211,7 +211,7 @@ class smartPID:
         return output
         
 class strategy4Controller:
-    """!@brief Models HEBI control strategy 4 using 3 PID controllers discretised using the tustin approximation """
+    """!@brief Models HEBI control strategy 4 using 3 PID controllers discretised using the Tustin approximation """
     def __init__(self, ts=0, targetConstraints=[None, 3.43, 20], outputConstraints=[10, 1, 1], feedfowards=[0, 1, 1], d_on_errors=[True, True, False], constants=None) -> None:
         """ Class constructor """
         self.ts = ts
@@ -317,6 +317,7 @@ class jointcontrol_env(gym.Env):
         self.numSteps = 0                       # Number of performed steps this episode
         self.maxSteps = 0                       # Maximum number of steps per episode
         self.latestTrajectory = None            # Stores the trajectory resulting from the latest sim step
+        self.ts = params["SimParams"]["Ts"]     # Stores time discretisation in order to properly visualise trajectories
 
         # Connect to the bullet server
         self.physicsClient = p.connect(p.SHARED_MEMORY)
@@ -346,10 +347,11 @@ class jointcontrol_env(gym.Env):
             return self.formatObs(), -10, True, {} 
 
         # Scale action from [-1, 1] back to params
-        action = np.multiply(
-            np.array(action), 
-            np.array(self.jointParams["MaxChange"], dtype=np.float64)
-        )
+        #action = np.multiply(
+        #    np.array(action), 
+        #    np.array(self.jointParams["MaxChange"], dtype=np.float64)
+        #)
+        action = self.actionToParams(action)
 
         # Calculate current controller params after action
         self.currentParams += np.array(action)
@@ -386,7 +388,7 @@ class jointcontrol_env(gym.Env):
             # Since we only test postion control, the vel and effort commands are set to 0
             torque = PWM2Torque(
                 self.controllerInstance.update([entry, 0, 0], feedback),
-                maxMotorTorque=14
+                maxMotorTorque=self.jointParams["MaxTorque"]
             )
             self.torqueControlUpdate(torque)
             # Wait for synchronisation
@@ -416,18 +418,87 @@ class jointcontrol_env(gym.Env):
     def reset(self, episodeType='step', config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":80, "maxSteps":40 }):
         """
         Resets environment and returns env observation 
+
+        The control signal for an episode can be set using the episodeType param and configured using config, a dictionary defining the episode configuration.
+        Implemented episode types are 'step' and 'custom'. They are configured using these params in the config dict:
+
+        step (default):
+        performs a step response from initialPos to stepPos
+            - initialPos [float]:       Initial position before step
+            - stepPos [float]:          Position after step
+            - samplesPerStep [int]:     Number of discrete controller updates per performed step response
+            - maxSteps [int]:           Number of performed step responses per episode
+
+        customSignal:
+        performs a custom response (raw input signal is provided in config)
+            - inSignal [list of floats] Applied control signal for each step
+            - maxSteps [int]:           Number of performed step responses per episode
+
+        square:
+        performs response to a square input signal
+            - lowerSignal:              Input signal when wave is low
+            - higherSignal:             Input signal when wave is high
+            - pulseLength:              Length of each low and high pulse
+            - numPulses:                Number of performed pulses
+            - maxSteps [int]:           Number of performed step responses per episode
+
+        generator (TODO):
+        performs a custom response (a generator object is provided in config)
+            - inSignal [generator]      Generator object for generaring control signal
+            - maxSteps [int]:           Number of performed step responses per episode
         
-        # TODO: Other testscenarios than step
+        Switching between types of control signals is implemented using a dict and each episodeType is implemented as its own method.
+        In order to use any response other than 'step', the reset method must be called as env.env.reset(episodeType=.., config=..) instead of env.reset() due to how Gym's inheritance is implemented.
         """
+        def step(self, config):
+            """ Creates and configures step response """
+            # Create step response as a simple list and set number of performed tests per episode
+            self.controlSignal = [config["initialPos"]] + [ config["stepPos"] for _ in range(config["samplesPerStep"]-1) ]
+            self.maxSteps = config["maxSteps"]
+
+        def customSignal(self, config):
+            """ Configures custom signal """
+            # Set custom signal and number of performed tests per episode
+            self.controlSignal = config["inSignal"]
+            self.maxSteps = config["maxSteps"]
+
+        def square(self, config):
+            """ Creates and configures square signal response """
+            # Create single pulse as simple list
+            pulse = [ config["lowerSignal"] for _ in range(config["pulseLength"]) ] + [ config["higherSignal"] for _ in range(config["pulseLength"]) ]
+            # Append single pulse multiple times to pulseSignal in order to create the whole signal
+            pulseSignal = []
+            for _ in range(config["numPulses"]): pulseSignal += pulse
+            # Set signal and number of performed tests per episode
+            self.controlSignal = pulseSignal
+            self.maxSteps = config["maxSteps"]
+
+        def generator(self, config):
+            """ Creates and configures an input signal based on a generator """
+            pass
+
+        # Create dict to mimick switch statement between different modes
+        episodeTypes = {
+            "step": step,
+            "customSignal": customSignal,
+            "square": square,
+            "generator": generator
+        }
+
         # Instantiate controller with default params
         self.controllerInstance = copy.deepcopy(self.controllerBlueprint)
         self.currentParams = np.array(self.jointParams["Defaults"], dtype=np.float64)
 
-        # Create control signal and set number of performed steps to 0
-        self.controlSignal = [config["initialPos"]] + [ config["stepPos"] for _ in range(config["samplesPerStep"]-1) ]
-        self.maxSteps = config["maxSteps"]
-        self.numSteps = 0
+        # Create control signal based on set mode
+        try:
+            episodeTypes[episodeType](self, config)
+        except KeyError:
+            # Handle KeyError by setting up an empty episode
+            self.controlSignal = [0]
+            self.maxSteps = 0
 
+        # Set perfomed steps for this episode to 0 and return
+        self.numSteps = 0
         return self.formatObs()
 
     def render(self, mode="human"):
@@ -454,6 +525,20 @@ class jointcontrol_env(gym.Env):
         """ Formats observation """
         obs = self.currentParams
         return obs
+
+    def actionToParams(self, action):
+        """ Scales action from [-1, 1] to physical controller params """
+        return np.multiply(
+            np.array(action), 
+            np.array(self.jointParams["MaxChange"], dtype=np.float64)
+        )
+
+    def paramsToAction(self, params):
+        """ Scales controller params to action space of [-1, 1] """
+        return np.divide(
+            np.array(self.jointParams["MaxChange"], dtype=np.float64),
+            np.array(params)
+        )
 
     def getJointState(self):
         """ Returns Jointstate in form [pos, vel, effort] """
@@ -495,15 +580,17 @@ class jointcontrol_env(gym.Env):
     def visualiseTrajectory(self):
         """ Plots control signal vs. resulting trajectory using matplotlib """
         plt.plot(
-            [ i for i, _ in enumerate(self.controlSignal) ],
+            self.ts*np.array([ i for i, _ in enumerate(self.controlSignal) ]),
             self.controlSignal,
             label = "Control Signal"
         )
         if self.latestTrajectory != None:
             plt.plot(
-                [ i for i, _ in enumerate(self.latestTrajectory) ],
+                self.ts*np.array([ i for i, _ in enumerate(self.latestTrajectory) ]),
                 self.latestTrajectory,
                 label = "Resulting Position"
             )
+        plt.xlabel("Time [s]")
+        plt.ylabel("Joint Position [rad]")
         plt.legend()
         plt.show()

@@ -72,7 +72,7 @@ class bulletInstance:
             x, y = from_s(r, simParams["StationsPerCol"])
             # Add URDF
             robotId = self.addUrdf(
-                simParams["URDFName"],
+                simParams["URDFName"][r],
                 pos = [
                     x*simParams["StationSize"][0],
                     y*simParams["StationSize"][1],
@@ -164,13 +164,3 @@ class ROSWrapper:
 if __name__ == "__main__":
     wrap = ROSWrapper()
     rospy.spin()
-
-
-
-#import rospy
-#from jointcontrol.msg import jointMetric
-#rospy.init_node("test")
-#pub = rospy.Publisher("jointcontrol/envSync", jointMetric, queue_size = 3)
-#msg = jointMetric()
-#pub.publish(msg)
-
