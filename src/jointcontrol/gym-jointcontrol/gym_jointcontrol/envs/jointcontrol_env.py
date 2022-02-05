@@ -570,23 +570,23 @@ class jointcontrol_env(gym.Env):
     def waitForPhysicsUpdate(self):
         """ Synchronises env with physics server using ROS messages """
         # Publish message indicating that env is ready for sim step
+        self.ready = True
         self.syncPub.publish(
             jointMetric( [ False for _ in range(self.jointidx) ] + [ True ] )
         )
-        self.ready = True
         while self.ready:
-            time.sleep(1/400)
+            time.sleep(1/10000)
 
     def visualiseTrajectory(self):
         """ Plots control signal vs. resulting trajectory using matplotlib """
         plt.plot(
-            self.ts*np.array([ i for i, _ in enumerate(self.controlSignal) ]),
+            self.ts*np.arange(len(self.controlSignal)),
             self.controlSignal,
             label = "Control Signal"
         )
         if self.latestTrajectory != None:
             plt.plot(
-                self.ts*np.array([ i for i, _ in enumerate(self.latestTrajectory) ]),
+                self.ts*np.arange(len(self.latestTrajectory)),
                 self.latestTrajectory,
                 label = "Resulting Position"
             )

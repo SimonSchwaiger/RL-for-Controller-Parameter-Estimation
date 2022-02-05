@@ -62,3 +62,29 @@ plt.plot(
 
 plt.show()
 
+
+
+#############################################################
+# TEST MODEL BENCHMARKING
+
+import sys
+sys.path.append("/catkin_ws/src/jointcontrol/scripts")
+from controllerTest import *
+
+import gym
+import gym_jointcontrol
+
+env = gym.make('jointcontrol-v0', jointidx=0)
+env.reset()
+
+class dummyModel:
+    def __init__(self) -> None:
+        pass    
+    #
+    def predict(self, obs):
+        return [0,0,0,0,0,0,0,0,0], None
+
+model = dummyModel()
+
+test = controllerTest(env, model, "testModel")
+test.plotResults()
