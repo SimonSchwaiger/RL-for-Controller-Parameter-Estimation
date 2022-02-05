@@ -22,9 +22,9 @@ python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcon
 
 ## Start shared memory physics server
 # Headless
-#/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory &
+/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory &
 # With GUI
-/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory_GUI &
+#/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory_GUI &
 sleep 1
 
 ## Connect to the server, load robots and set up synchronisation between envs
