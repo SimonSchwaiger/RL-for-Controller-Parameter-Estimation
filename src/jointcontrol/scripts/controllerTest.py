@@ -5,8 +5,6 @@ import os
 import json
 
 import numpy as np
-import pandas as pd
-import seaborn as sns
 import matplotlib.pyplot as plt
 
 class controllerTest:
@@ -67,7 +65,6 @@ class controllerTest:
             config["pulseLength"] = int(round((1/freq)/env.env.ts))
             # Set number of pulses, in order for responses to be equally long
             config["numPulses"] = int(round(refLen/config["pulseLength"]))*numPulses
-            #config["numPulses"] =  TODO
             # Reset env in square mode
             env.env.reset(episodeType='square', config=config)
             # Set testing params and perform step
@@ -96,7 +93,7 @@ class controllerTest:
             "freqResponseTrajectories": squareTrajectories
         }
     #
-    def plotResults(self, gui=False):
+    def plotResults(self, gui=False, outpath=None):
         """ Plots test results stored in self.testResults """
         # Create Matplotlib figure and set title
         fig, axs = plt.subplots(3, 1, constrained_layout=True, gridspec_kw={'height_ratios': [1, 1, 2]})
@@ -145,6 +142,25 @@ class controllerTest:
         axs[2].legend()
         axs[2].set_xlabel("Time [s]")
         axs[2].set_ylabel("Average Joint Position [rad]")
-        axs[2].set_title("Square Control Signal Frequency Response")          
-        # If GUI var is set, visualise the report, otherwise save it to a file
-        plt.show()
+        axs[2].set_title("Square Control Signal Frequency Response")
+        #
+        # Increase figure size for a cleaner presentation
+        size = fig.get_size_inches()
+        fig.set_size_inches(size[0]*1.4, size[1]*2)
+        # If outpath is set, create a directory in the path containing the report and raw test data
+        if outpath != None:
+            outpath =  "{}/{}".format(outpath, self.testResults["modelname"])
+            os.system( "mkdir {}".format(outpath) )
+            
+
+
+            with open( "{}/{}.json".format(outpath, self.testResults["modelname"]), 'w' ) as outfile:
+                json.dump(self.testResults, outfile)
+
+
+        # If GUI var is set, visualise the report
+        if gui: plt.show()
+
+
+#TODO: implement saving of raw data and testreport in predefined directory
+#TODO: expand to allow for testing of multiple testepisodes
