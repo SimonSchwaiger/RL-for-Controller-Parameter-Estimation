@@ -68,6 +68,7 @@ plt.show()
 # TEST MODEL BENCHMARKING
 
 import sys
+import time
 sys.path.append("/catkin_ws/src/jointcontrol/scripts")
 from controllerTest import *
 
@@ -86,5 +87,7 @@ class dummyModel:
 
 model = dummyModel()
 
+time.sleep(2)
+
 test = controllerTest(env, model, "testModel")
-test.plotResults()
+test.plotResults(gui=True, outpath="/app")

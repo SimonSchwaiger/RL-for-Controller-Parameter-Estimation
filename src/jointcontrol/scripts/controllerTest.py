@@ -93,6 +93,20 @@ class controllerTest:
             "freqResponseTrajectories": squareTrajectories
         }
     #
+    def removeArraysFromTestResults(self):
+        """
+        Serialises test results in order to save them as json format. 
+        
+        This method is required, since json cannot serialise dicts containing numpy arrays
+        """
+        data = copy.deepcopy(self.testResults)
+        #
+        for key in data:
+            if isinstance(data[key], np.ndarray):
+                data[key] = data[key].tolist()
+        #
+        return data
+    #
     def plotResults(self, gui=False, outpath=None):
         """ Plots test results stored in self.testResults """
         # Create Matplotlib figure and set title
@@ -151,16 +165,14 @@ class controllerTest:
         if outpath != None:
             outpath =  "{}/{}".format(outpath, self.testResults["modelname"])
             os.system( "mkdir {}".format(outpath) )
-            
-
-
+            plt.savefig(
+                "{}/{}.pdf".format(outpath, self.testResults["modelname"])
+            )
             with open( "{}/{}.json".format(outpath, self.testResults["modelname"]), 'w' ) as outfile:
-                json.dump(self.testResults, outfile)
-
-
+                json.dump(
+                    self.removeArraysFromTestResults(), 
+                    outfile)
         # If GUI var is set, visualise the report
         if gui: plt.show()
 
-
-#TODO: implement saving of raw data and testreport in predefined directory
 #TODO: expand to allow for testing of multiple testepisodes
