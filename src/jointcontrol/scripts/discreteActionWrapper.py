@@ -14,6 +14,8 @@ class jointcontrolDiscrete(gym.Wrapper):
         The actual discretisation for each controller parameter can be calculated by:
 
         realDiscretisation = discretisation*MaxChange
+
+        Only the step() method is implemented, because other methods of the jointcontrol env are unaffected by a changed action space.
         """
         # Inherit from original env and store discretisation level
         super().__init__(env)
@@ -34,15 +36,15 @@ class jointcontrolDiscrete(gym.Wrapper):
             3 -> increment param 2
             4 -> decrement param 2
             ...
-
         """        
+        # Make sure inputted action is valid and can be decoded
+        assert action < self.numParams*2
         # Create list of param changes based on discretisation and param size
         if action%2 == 0: tmp = self.discretisation
         else: tmp = -self.discretisation
         actionList = [ 0 for _ in range(self.numParams) ]
         actionList[int(action/2)] = tmp
-
-        # Perform step in non-discrete env
+        # Perform step in non-discrete env and return observation
         return self.env.step(actionList)
 
 
