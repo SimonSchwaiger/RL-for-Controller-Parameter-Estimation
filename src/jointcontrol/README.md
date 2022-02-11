@@ -4,13 +4,16 @@ This package allow for instantiation of an arbitrary amount of Gym environments,
 
 # Important Files
 
-These links can be used to quickly navigate to important files. The files are explained in the following sections.
+These links can be used to quickly navigate to important files. The files are explained in detail in the following sections.
 
 - parseConfig.py
 - physicsServer.py
 - jointcontrol_env.py
+- controllers.py
+- controllerTest.py
+- discreteActionWrapper.py
 
-## Config
+## Configuration
 
 The shared simulation environment in Bullet is created based on onfiguration files in the *./config* directory of the ROS package. Upon application start, the json config file is parsed by the parseConfig.py script, which loads all parameters into the ROS param server. The params are loaded as needed by the Gym environments as well as the simulation instance.
 
@@ -48,12 +51,15 @@ Controller params are set in the namespace /jointcontrol/J{}/. These params are 
 | MaxChange             | [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1] | Maximum allowed change for each param per step (vector of len(NumParams))
 | ParamDescription      |                              "PID PID PID" | Description what each parameter represents (for convenience, not used)
 
-
 ## Physics Server
 
 The shared simulation is instantiated by the physicsServer.py script in *./scripts*. This script loads the configuration from the ROS param server, loads in robot models, manages synchronisation between Gym environments and tracks which RobotID, JointID pair in bullet corresponds to which Gym environment.
 
 ## Gym Environment
 
-The Gym environment is implemented by jointcontrol_env.py in *./gym-jointcontrol/gym_jointcontrol/envs/*. The controller whose dynamics should be learned by the agend, is modelled after the [Strategy 4 controller](https://docs.hebi.us/core_concepts.html#control-strategies) found in the [Hebi X-series actuators](https://docs.hebi.us/core_concepts.html#core-modules). The environment implements a normal [GymEnv](https://github.com/openai/gym/blob/master/gym/core.py) and provides the *compute_reward* method, in a similar manner to [GoalEnv](https://github.com/openai/gym/blob/3394e245727c1ae6851b504a50ba77c73cd4c65b/gym/core.py#L160). Additionally, the last step can be visualised in matplotlib using the *visualiseTrajectory* method. For detailled info about implemented methods, refer to the generated class reference of jointcontrol_env.py .
+The Gym environment is implemented by jointcontrol_env.py in *./gym-jointcontrol/gym_jointcontrol/envs/*. The controller whose dynamics should be learned by the agent, is modelled after the [Strategy 4 controller](https://docs.hebi.us/core_concepts.html#control-strategies) found in the [Hebi X-series actuators](https://docs.hebi.us/core_concepts.html#core-modules). Implementations for each controller block are done in controllers.py in */scripts/*. The environment implements a normal [GymEnv](https://github.com/openai/gym/blob/master/gym/core.py) and provides the *compute_reward* method, in a similar manner to [GoalEnv](https://github.com/openai/gym/blob/3394e245727c1ae6851b504a50ba77c73cd4c65b/gym/core.py#L160). Additionally, the last step can be visualised in matplotlib using the *visualiseTrajectory* method. For model testing, controllerTest.py in */scripts/* allows for automated step response and frequency response testing of controllers resulting from a model. For detailled info about implemented methods, refer to the generated class reference of jointcontrol_env.py controllers.py and controllerTest.py .
+
+Additionally, the Gym environment can be wrapped using the discreteActionWrapper.py class in *./scripts/*, in order to create a discrete action space, allowing for compatibility with more types of agents, such as [Deep Q-Networks](https://stable-baselines.readthedocs.io/en/master/modules/dqn.html). The action space is discretised by allowing the agent to increment or decrement each parameter by a fixed amount in the scaled action-space (range [-1, 1] for each parameter). Since the action space scales with the maximum allowed parameter change, this scaling also applies to the discretisation. This has been done, since it makes sense to allow a bigger change per step for proportional gains compared to derivative or integral gains. This discretisation factor can be set when instantiating the wrapper. The physical level of discretisation can be calculated per joint as _discretisation*maxChange_ for each parameter.
+
+
 

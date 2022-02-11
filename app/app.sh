@@ -5,7 +5,6 @@ source /opt/ros/noetic/setup.bash
 source /catkin_ws/devel/setup.bash
 
 ## Install custom gym env
-#pip3 install -e /catkin_ws/src/RL-with-3DOF-Robots/fhtw3dof/gym-fhtw3dof
 pip3 install -e /catkin_ws/src/jointcontrol/gym-jointcontrol
 
 ## Start roscore
@@ -35,22 +34,10 @@ sleep 15
 # Output all set params
 rosparam list
 
-# Generate Doxygen Documentation
-# rosdoc_lite -o ./generatedDocumentation /catkin_ws/src/jointcontrol/
+## Set environment variables and start jupyter lab vor html-based interactive model training
+export JUPYTER_ENABLE_LAB=yes
+export JUPYTER_TOKEN=docker
+jupyter-lab --ip 0.0.0.0 -NotebookApp.token='smart_control' --no-browser --allow-root &
 
-python
-
-# start ros nodes and put them to the background
-#roslaunch --wait saimon SAImon.launch coll_map:=usecase.yaml run_on_real_robot:=false &
-
-# run interactive marker
-#python interactive_marker.py &
-
-# start interactive shell for whatever you want to do
-# if you want to automatically launch something, you can do that here
-#sleep 5
-#python #pyBulletTest.py
-
-
-
-
+# Start interactive shell to sit idle and keep everything running
+bash

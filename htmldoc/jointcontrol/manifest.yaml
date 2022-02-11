@@ -1,0 +1,21 @@
+actions: []
+authors: ''
+brief: ''
+bugtracker: ''
+depends:
+- roscpp
+- std_msgs
+- rospy
+- catkin
+- sensor_msgs
+- message_runtime
+- geometry_msgs
+description: The jointcontrol package
+license: TODO
+maintainers: root <root@todo.todo>
+msgs:
+- jointMetric
+package_type: package
+repo_url: ''
+srvs: []
+url: ''

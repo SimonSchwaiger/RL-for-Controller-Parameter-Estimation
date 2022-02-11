@@ -90,4 +90,20 @@ model = dummyModel()
 time.sleep(2)
 
 test = controllerTest(env, model, "testModel")
-test.plotResults(gui=True, outpath="/app")
+test.plotResults(gui=False, outpath="/app")
+
+
+
+
+#############################################################
+# TEST DISCRETE WRAPPER
+
+import sys
+import time
+sys.path.append("/catkin_ws/src/jointcontrol/scripts")
+from discreteActionWrapper import *
+
+env = jointcontrolDiscrete(gym.make('jointcontrol-v0', jointidx=0))
+env.reset()
+
+

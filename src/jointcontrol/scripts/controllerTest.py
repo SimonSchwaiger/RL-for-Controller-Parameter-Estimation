@@ -132,6 +132,7 @@ class controllerTest:
             self.testResults["stepControlSignal"],
             label = "Control Signal"
         )
+        axs[1].legend()
         axs[1].set_xlabel("Time [s]")
         axs[1].set_ylabel("Joint Position [rad]")
         axs[1].set_title("Resulting Step Trajectory")      

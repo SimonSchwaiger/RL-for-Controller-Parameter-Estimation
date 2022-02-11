@@ -46,6 +46,3 @@ class jointcontrolDiscrete(gym.Wrapper):
         actionList[int(action/2)] = tmp
         # Perform step in non-discrete env and return observation
         return self.env.step(actionList)
-
-
-
