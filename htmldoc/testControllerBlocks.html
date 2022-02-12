@@ -921,17 +921,30 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 | The full license is in the file LICENSE, distributed with this software.
 |----------------------------------------------------------------------------*/
 
+/* Changes made here to give the jupyterlab template a more classic notebook look */
+
 @charset "UTF-8";
 html{
   -webkit-box-sizing:border-box;
-          box-sizing:border-box; }
+          box-sizing:border-box; 
+          max-width: 1100px;
+          margin: auto;
+          padding-top: 30px;
+          padding-bottom: 30px;
+          padding-right: 40px;
+          padding-left: 0px;
+          border-style: solid;
+          border-width: 1px;
+          border-color: rgb(255, 255, 255);
+          box-shadow: 0px 0px 8px 8px rgba(146, 146, 146, 0.288); /*
+          filter: drop-shadow(0 0 0.75rem rgb(75, 75, 75)); */ }
 
 *,
 *::before,
 *::after{
   -webkit-box-sizing:inherit;
-          box-sizing:inherit; }
-
+          box-sizing:inherit;}
+/* End of changes */
 body{
   font-size:14px;
   font-weight:400;
@@ -14056,6 +14069,14 @@ div.jp-Cell-Placeholder-content-3 {
   top: 140px;
 }
 
+
+
+
+
+
+
+
+
 </style>
 
     <style type="text/css">
@@ -14577,34 +14598,95 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h1 id="Testing-of-Controllers-approximated-using-the-Tustin-Approximation">Testing of Controllers approximated using the Tustin Approximation<a class="anchor-link" href="#Testing-of-Controllers-approximated-using-the-Tustin-Approximation">&#182;</a></h1><p>This notebook instantiates the discretised controllers used for the Gym environment and performs various step responses in order to verify controller approximations.</p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set matplotlib to inline mode and import necessary components</span>
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib_inline.backend_inline</span>
+<span class="n">matplotlib_inline</span><span class="o">.</span><span class="n">backend_inline</span><span class="o">.</span><span class="n">set_matplotlib_formats</span><span class="p">(</span><span class="s1">&#39;svg&#39;</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;/catkin_ws/src/jointcontrol/scripts&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">controllers</span> <span class="kn">import</span> <span class="o">*</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="T1-Block-open-Loop-Step-Response">T1 Block open Loop Step Response<a class="anchor-link" href="#T1-Block-open-Loop-Step-Response">&#182;</a></h2><p>Open loop step response from 0 to 1 with <em>kp=1</em> and <em>t1=5</em>.</p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell  jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set simulation time and discretisation</span>
+<span class="n">simTime</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">100</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">simTime</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">ts</span><span class="p">))</span>
+<span class="c1"># Set up time and input signals</span>
+<span class="n">time</span> <span class="o">=</span> <span class="p">[</span> <span class="n">i</span><span class="o">*</span><span class="n">ts</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">inSignal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+<span class="c1"># Calculate output signal</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">PT1Block</span><span class="p">(</span><span class="n">kp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T1</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="n">block</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inSignal</span> <span class="p">]</span>
+<span class="c1"># Plot everything</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">inSignal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Input&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Output&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;T1 Input and Output Signals&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 
+
 <div class="jp-OutputArea jp-Cell-outputArea">
 
 <div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
 
 
 <div class="jp-RenderedSVG jp-OutputArea-output " data-mime-type="image/svg+xml">
@@ -14616,7 +14698,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2022-02-11T12:03:40.508516</dc:date>
+    <dc:date>2022-02-12T17:56:53.146378</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -14652,12 +14734,12 @@ z
     <g id="xtick_1">
      <g id="line2d_1">
       <defs>
-       <path id="m7bd30fe2b9" d="M 0 0 
+       <path id="m6618ae283e" d="M 0 0 
 L 0 3.5 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
@@ -14693,7 +14775,7 @@ z
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="109.735161" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="109.735161" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
@@ -14723,7 +14805,7 @@ z
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="160.470889" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="160.470889" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
@@ -14763,7 +14845,7 @@ z
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="211.206618" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="211.206618" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
@@ -14811,7 +14893,7 @@ z
     <g id="xtick_5">
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="261.942347" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="261.942347" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
@@ -14846,7 +14928,7 @@ z
     <g id="xtick_6">
      <g id="line2d_6">
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="312.678075" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="312.678075" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
@@ -14887,7 +14969,7 @@ z
     <g id="xtick_7">
      <g id="line2d_7">
       <g>
-       <use xlink:href="#m7bd30fe2b9" x="363.413804" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m6618ae283e" x="363.413804" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
@@ -15083,12 +15165,12 @@ z
     <g id="ytick_1">
      <g id="line2d_8">
       <defs>
-       <path id="mf282f5102a" d="M 0 0 
+       <path id="mfe0f72b05e" d="M 0 0 
 L -3.5 0 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#mf282f5102a" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#mfe0f72b05e" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_9">
@@ -15112,7 +15194,7 @@ z
     <g id="ytick_2">
      <g id="line2d_9">
       <g>
-       <use xlink:href="#mf282f5102a" x="43.78125" y="175.221818" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#mfe0f72b05e" x="43.78125" y="175.221818" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_10">
@@ -15127,7 +15209,7 @@ z
     <g id="ytick_3">
      <g id="line2d_10">
       <g>
-       <use xlink:href="#mf282f5102a" x="43.78125" y="135.687273" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#mfe0f72b05e" x="43.78125" y="135.687273" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_11">
@@ -15142,7 +15224,7 @@ z
     <g id="ytick_4">
      <g id="line2d_11">
       <g>
-       <use xlink:href="#mf282f5102a" x="43.78125" y="96.152727" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#mfe0f72b05e" x="43.78125" y="96.152727" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_12">
@@ -15157,7 +15239,7 @@ z
     <g id="ytick_5">
      <g id="line2d_12">
       <g>
-       <use xlink:href="#mf282f5102a" x="43.78125" y="56.618182" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#mfe0f72b05e" x="43.78125" y="56.618182" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_13">
@@ -15213,7 +15295,7 @@ z
     <g id="ytick_6">
      <g id="line2d_13">
       <g>
-       <use xlink:href="#mf282f5102a" x="43.78125" y="17.083636" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#mfe0f72b05e" x="43.78125" y="17.083636" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_14">
@@ -15512,7 +15594,7 @@ z
 L 59.151639 17.083636 
 L 363.363068 17.083636 
 L 363.363068 17.083636 
-" clip-path="url(#pe1e554b2e8)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
+" clip-path="url(#pbd4a4ed399)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
    </g>
    <g id="line2d_15">
     <path d="M 58.999432 214.756364 
@@ -15560,7 +15642,7 @@ L 245.047349 17.212837
 L 287.513154 17.107861 
 L 363.363068 17.084855 
 L 363.363068 17.084855 
-" clip-path="url(#pe1e554b2e8)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#pbd4a4ed399)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="patch_3">
     <path d="M 43.78125 224.64 
@@ -15735,7 +15817,7 @@ L 296.620313 210.060312
   </g>
  </g>
  <defs>
-  <clipPath id="pe1e554b2e8">
+  <clipPath id="pbd4a4ed399">
    <rect x="43.78125" y="7.2" width="334.8" height="217.44"/>
   </clipPath>
  </defs>
@@ -15754,21 +15836,58 @@ L 296.620313 210.060312
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="D-Block-open-Loop-Step-Response">D-Block open Loop Step Response<a class="anchor-link" href="#D-Block-open-Loop-Step-Response">&#182;</a></h2><p>Open loop step response from 0 to 1 with <em>kd=1</em>. A T1 block wih <em>t1=1</em> is put in series with the D block in order to make the d block implementable in practice.</p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell  jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set simulation time and discretisation</span>
+<span class="n">simTime</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">100</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">simTime</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">ts</span><span class="p">))</span>
+<span class="c1"># Set up time and input signals</span>
+<span class="n">time</span> <span class="o">=</span> <span class="p">[</span> <span class="n">i</span><span class="o">*</span><span class="n">ts</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">inSignal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+<span class="c1"># Calculate output signal</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">DBlock</span><span class="p">(</span><span class="n">kd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="n">PT1Block</span><span class="p">(</span><span class="n">kp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T1</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="n">t1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inSignal</span> <span class="p">]</span>
+<span class="c1"># Plot everything</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">inSignal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Input&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Output&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;D-T1 Input and Output Signals&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 
+
 <div class="jp-OutputArea jp-Cell-outputArea">
 
 <div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
 
 
 <div class="jp-RenderedSVG jp-OutputArea-output " data-mime-type="image/svg+xml">
@@ -15780,7 +15899,7 @@ L 296.620313 210.060312
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2022-02-11T12:03:40.619536</dc:date>
+    <dc:date>2022-02-12T17:56:53.279807</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -15816,12 +15935,12 @@ z
     <g id="xtick_1">
      <g id="line2d_1">
       <defs>
-       <path id="m4be2db6a4f" d="M 0 0 
+       <path id="m2b208b7372" d="M 0 0 
 L 0 3.5 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m4be2db6a4f" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
@@ -15857,7 +15976,7 @@ z
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use xlink:href="#m4be2db6a4f" x="109.735161" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="109.735161" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
@@ -15887,7 +16006,7 @@ z
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use xlink:href="#m4be2db6a4f" x="160.470889" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="160.470889" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
@@ -15927,7 +16046,7 @@ z
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m4be2db6a4f" x="211.206618" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="211.206618" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
@@ -15975,7 +16094,7 @@ z
     <g id="xtick_5">
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m4be2db6a4f" x="261.942347" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="261.942347" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
@@ -16010,7 +16129,7 @@ z
     <g id="xtick_6">
      <g id="line2d_6">
       <g>
-       <use xlink:href="#m4be2db6a4f" x="312.678075" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="312.678075" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
@@ -16051,7 +16170,7 @@ z
     <g id="xtick_7">
      <g id="line2d_7">
       <g>
-       <use xlink:href="#m4be2db6a4f" x="363.413804" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m2b208b7372" x="363.413804" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
@@ -16247,12 +16366,12 @@ z
     <g id="ytick_1">
      <g id="line2d_8">
       <defs>
-       <path id="m70cf3d510d" d="M 0 0 
+       <path id="m981035735a" d="M 0 0 
 L -3.5 0 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m70cf3d510d" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m981035735a" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_9">
@@ -16276,7 +16395,7 @@ z
     <g id="ytick_2">
      <g id="line2d_9">
       <g>
-       <use xlink:href="#m70cf3d510d" x="43.78125" y="175.221818" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m981035735a" x="43.78125" y="175.221818" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_10">
@@ -16291,7 +16410,7 @@ z
     <g id="ytick_3">
      <g id="line2d_10">
       <g>
-       <use xlink:href="#m70cf3d510d" x="43.78125" y="135.687273" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m981035735a" x="43.78125" y="135.687273" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_11">
@@ -16306,7 +16425,7 @@ z
     <g id="ytick_4">
      <g id="line2d_11">
       <g>
-       <use xlink:href="#m70cf3d510d" x="43.78125" y="96.152727" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m981035735a" x="43.78125" y="96.152727" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_12">
@@ -16321,7 +16440,7 @@ z
     <g id="ytick_5">
      <g id="line2d_12">
       <g>
-       <use xlink:href="#m70cf3d510d" x="43.78125" y="56.618182" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m981035735a" x="43.78125" y="56.618182" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_13">
@@ -16377,7 +16496,7 @@ z
     <g id="ytick_6">
      <g id="line2d_13">
       <g>
-       <use xlink:href="#m70cf3d510d" x="43.78125" y="17.083636" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m981035735a" x="43.78125" y="17.083636" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_14">
@@ -16704,7 +16823,7 @@ z
 L 59.151639 17.083636 
 L 363.363068 17.083636 
 L 363.363068 17.083636 
-" clip-path="url(#p9d07c5517e)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
+" clip-path="url(#p729b98f3b7)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
    </g>
    <g id="line2d_15">
     <path d="M 58.999432 214.756364 
@@ -16738,7 +16857,7 @@ L 102.73363 214.720515
 L 123.535279 214.75577 
 L 363.363068 214.756364 
 L 363.363068 214.756364 
-" clip-path="url(#p9d07c5517e)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#p729b98f3b7)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="patch_3">
     <path d="M 43.78125 224.64 
@@ -16913,7 +17032,7 @@ L 296.620313 122.518437
   </g>
  </g>
  <defs>
-  <clipPath id="p9d07c5517e">
+  <clipPath id="p729b98f3b7">
    <rect x="43.78125" y="7.2" width="334.8" height="217.44"/>
   </clipPath>
  </defs>
@@ -16932,21 +17051,61 @@ L 296.620313 122.518437
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="PT2-open-Loop-Step-Response">PT2 open Loop Step Response<a class="anchor-link" href="#PT2-open-Loop-Step-Response">&#182;</a></h2><p>Open loop step response from 0 to 1 with <em>kp=1</em> <em>T=1</em> and <em>D=1</em> as well as <em>D=0.2</em>.</p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell  jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set simulation time and discretisation</span>
+<span class="n">simTime</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">100</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">simTime</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">ts</span><span class="p">))</span>
+<span class="c1"># Set up time and input signals</span>
+<span class="n">time</span> <span class="o">=</span> <span class="p">[</span> <span class="n">i</span><span class="o">*</span><span class="n">ts</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">inSignal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">inSignal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Input&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="c1"># Plot D=1</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">PT2Block</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="n">block</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inSignal</span> <span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Output [D=1]&quot;</span><span class="p">)</span>
+<span class="c1"># Plot D=0.2</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">PT2Block</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">kp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="n">block</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inSignal</span> <span class="p">]</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Output [D=0.2]&quot;</span><span class="p">)</span>
+<span class="c1"># Finish Plot</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;T2 Input and Output Signals&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 
+
 <div class="jp-OutputArea jp-Cell-outputArea">
 
 <div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
 
 
 <div class="jp-RenderedSVG jp-OutputArea-output " data-mime-type="image/svg+xml">
@@ -16958,7 +17117,7 @@ L 296.620313 122.518437
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2022-02-11T12:03:40.717833</dc:date>
+    <dc:date>2022-02-12T17:56:53.376327</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -16994,12 +17153,12 @@ z
     <g id="xtick_1">
      <g id="line2d_1">
       <defs>
-       <path id="m76426cd6ff" d="M 0 0 
+       <path id="m970c8a4a22" d="M 0 0 
 L 0 3.5 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m76426cd6ff" x="58.999432" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="58.999432" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
@@ -17035,7 +17194,7 @@ z
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use xlink:href="#m76426cd6ff" x="109.735161" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="109.735161" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
@@ -17065,7 +17224,7 @@ z
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use xlink:href="#m76426cd6ff" x="160.470889" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="160.470889" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
@@ -17105,7 +17264,7 @@ z
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m76426cd6ff" x="211.206618" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="211.206618" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
@@ -17153,7 +17312,7 @@ z
     <g id="xtick_5">
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m76426cd6ff" x="261.942347" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="261.942347" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
@@ -17188,7 +17347,7 @@ z
     <g id="xtick_6">
      <g id="line2d_6">
       <g>
-       <use xlink:href="#m76426cd6ff" x="312.678075" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="312.678075" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
@@ -17229,7 +17388,7 @@ z
     <g id="xtick_7">
      <g id="line2d_7">
       <g>
-       <use xlink:href="#m76426cd6ff" x="363.413804" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m970c8a4a22" x="363.413804" y="228.05723" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
@@ -17425,12 +17584,12 @@ z
     <g id="ytick_1">
      <g id="line2d_8">
       <defs>
-       <path id="m67daf6294b" d="M 0 0 
+       <path id="m8ce1c1f3b2" d="M 0 0 
 L -3.5 0 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="218.173594" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="218.173594" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_9">
@@ -17454,7 +17613,7 @@ z
     <g id="ytick_2">
      <g id="line2d_9">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="192.276797" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="192.276797" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_10">
@@ -17469,7 +17628,7 @@ z
     <g id="ytick_3">
      <g id="line2d_10">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="166.38" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="166.38" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_11">
@@ -17484,7 +17643,7 @@ z
     <g id="ytick_4">
      <g id="line2d_11">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="140.483203" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="140.483203" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_12">
@@ -17499,7 +17658,7 @@ z
     <g id="ytick_5">
      <g id="line2d_12">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="114.586406" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="114.586406" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_13">
@@ -17555,7 +17714,7 @@ z
     <g id="ytick_6">
      <g id="line2d_13">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="88.68961" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="88.68961" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_14">
@@ -17570,7 +17729,7 @@ z
     <g id="ytick_7">
      <g id="line2d_14">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="62.792813" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="62.792813" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_15">
@@ -17585,7 +17744,7 @@ z
     <g id="ytick_8">
      <g id="line2d_15">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="36.896016" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="36.896016" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_16">
@@ -17600,7 +17759,7 @@ z
     <g id="ytick_9">
      <g id="line2d_16">
       <g>
-       <use xlink:href="#m67daf6294b" x="43.78125" y="10.999219" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m8ce1c1f3b2" x="43.78125" y="10.999219" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_17">
@@ -17899,7 +18058,7 @@ z
 L 59.151639 88.68961 
 L 363.363068 88.68961 
 L 363.363068 88.68961 
-" clip-path="url(#p3a94a00785)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
+" clip-path="url(#p8c43eabee5)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
    </g>
    <g id="line2d_18">
     <path d="M 58.999432 218.173594 
@@ -17935,7 +18094,7 @@ L 113.692547 88.721498
 L 138.60379 88.689943 
 L 363.363068 88.68961 
 L 363.363068 88.68961 
-" clip-path="url(#p3a94a00785)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#p8c43eabee5)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="line2d_19">
     <path d="M 58.999432 218.173594 
@@ -18051,7 +18210,7 @@ L 277.315272 88.678915
 L 301.871365 88.68124 
 L 363.363068 88.689254 
 L 363.363068 88.689254 
-" clip-path="url(#p3a94a00785)" style="fill: none; stroke: #2ca02c; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#p8c43eabee5)" style="fill: none; stroke: #2ca02c; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="patch_3">
     <path d="M 43.78125 228.05723 
@@ -18297,7 +18456,7 @@ L 253.65625 53.071918
   </g>
  </g>
  <defs>
-  <clipPath id="p3a94a00785">
+  <clipPath id="p8c43eabee5">
    <rect x="43.78125" y="10.61723" width="334.8" height="217.44"/>
   </clipPath>
  </defs>
@@ -18316,21 +18475,62 @@ L 253.65625 53.071918
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="PID-closed-Loop-Step-Response">PID closed Loop Step Response<a class="anchor-link" href="#PID-closed-Loop-Step-Response">&#182;</a></h2><p>Closed loop step response from 0 to 1 with <em>kp=1</em>, <em>ki=1</em>, <em>kd=1</em>. A T1 block wih <em>t1=5</em> is put in series with the PID block in order to make it implementable in practice.</p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell  jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set simulation time and discretisation</span>
+<span class="n">simTime</span> <span class="o">=</span> <span class="mi">60</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">100</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">simTime</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">ts</span><span class="p">))</span>
+<span class="c1"># Set up time and input signals</span>
+<span class="n">time</span> <span class="o">=</span> <span class="p">[</span> <span class="n">i</span><span class="o">*</span><span class="n">ts</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">inSignal</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span> <span class="mi">1</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+<span class="c1"># Calculate output signal</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">PIDController</span><span class="p">(</span><span class="n">kp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ki</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kd</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">t1</span> <span class="o">=</span> <span class="n">PT1Block</span><span class="p">(</span><span class="n">kp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">T1</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">feedback</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">inSignal</span><span class="p">:</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">feedback</span><span class="p">)</span>
+    <span class="n">feedback</span> <span class="o">=</span> <span class="n">t1</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="o">-</span><span class="n">feedback</span><span class="p">))</span>
+<span class="c1"># Plot everything</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">inSignal</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Input&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Output&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;PID-T1 Input and Output Signals&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 
+
 <div class="jp-OutputArea jp-Cell-outputArea">
 
 <div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
 
 
 <div class="jp-RenderedSVG jp-OutputArea-output " data-mime-type="image/svg+xml">
@@ -18342,7 +18542,7 @@ L 253.65625 53.071918
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2022-02-11T12:03:40.807709</dc:date>
+    <dc:date>2022-02-12T17:56:53.467092</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -18378,12 +18578,12 @@ z
     <g id="xtick_1">
      <g id="line2d_1">
       <defs>
-       <path id="m40ab69f55f" d="M 0 0 
+       <path id="m935a17ad75" d="M 0 0 
 L 0 3.5 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m40ab69f55f" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
@@ -18419,7 +18619,7 @@ z
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use xlink:href="#m40ab69f55f" x="109.735161" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="109.735161" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
@@ -18449,7 +18649,7 @@ z
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use xlink:href="#m40ab69f55f" x="160.470889" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="160.470889" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
@@ -18489,7 +18689,7 @@ z
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m40ab69f55f" x="211.206618" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="211.206618" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
@@ -18537,7 +18737,7 @@ z
     <g id="xtick_5">
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m40ab69f55f" x="261.942347" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="261.942347" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
@@ -18572,7 +18772,7 @@ z
     <g id="xtick_6">
      <g id="line2d_6">
       <g>
-       <use xlink:href="#m40ab69f55f" x="312.678075" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="312.678075" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
@@ -18613,7 +18813,7 @@ z
     <g id="xtick_7">
      <g id="line2d_7">
       <g>
-       <use xlink:href="#m40ab69f55f" x="363.413804" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m935a17ad75" x="363.413804" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
@@ -18809,12 +19009,12 @@ z
     <g id="ytick_1">
      <g id="line2d_8">
       <defs>
-       <path id="m5cd965920d" d="M 0 0 
+       <path id="m18ccc2c5ed" d="M 0 0 
 L -3.5 0 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_9">
@@ -18838,7 +19038,7 @@ z
     <g id="ytick_2">
      <g id="line2d_9">
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="182.31577" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="182.31577" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_10">
@@ -18853,7 +19053,7 @@ z
     <g id="ytick_3">
      <g id="line2d_10">
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="149.875176" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="149.875176" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_11">
@@ -18868,7 +19068,7 @@ z
     <g id="ytick_4">
      <g id="line2d_11">
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="117.434582" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="117.434582" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_12">
@@ -18883,7 +19083,7 @@ z
     <g id="ytick_5">
      <g id="line2d_12">
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="84.993988" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="84.993988" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_13">
@@ -18939,7 +19139,7 @@ z
     <g id="ytick_6">
      <g id="line2d_13">
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="52.553394" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="52.553394" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_14">
@@ -18954,7 +19154,7 @@ z
     <g id="ytick_7">
      <g id="line2d_14">
       <g>
-       <use xlink:href="#m5cd965920d" x="43.78125" y="20.1128" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m18ccc2c5ed" x="43.78125" y="20.1128" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_15">
@@ -19304,7 +19504,7 @@ z
 L 59.151639 52.553394 
 L 363.363068 52.553394 
 L 363.363068 52.553394 
-" clip-path="url(#p105173404b)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
+" clip-path="url(#pe60cd4f6ac)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
    </g>
    <g id="line2d_16">
     <path d="M 58.999432 214.756364 
@@ -19378,7 +19578,7 @@ L 277.213801 52.449621
 L 321.658299 52.576623 
 L 363.363068 52.547308 
 L 363.363068 52.547308 
-" clip-path="url(#p105173404b)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#pe60cd4f6ac)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="patch_3">
     <path d="M 43.78125 224.64 
@@ -19553,7 +19753,7 @@ L 296.620313 34.976562
   </g>
  </g>
  <defs>
-  <clipPath id="p105173404b">
+  <clipPath id="pe60cd4f6ac">
    <rect x="43.78125" y="7.2" width="334.8" height="217.44"/>
   </clipPath>
  </defs>
@@ -19572,21 +19772,62 @@ L 296.620313 34.976562
 <div class="jp-Cell-inputWrapper">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
-<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="Strategy-4-Controller-open-Loop-Step-Response">Strategy 4 Controller open Loop Step Response<a class="anchor-link" href="#Strategy-4-Controller-open-Loop-Step-Response">&#182;</a></h2><p>Open loop step response from 0 to 1 with <a href="https://docs.hebi.us/core_concepts.html#control-strategies">Hebi Strategy 4</a> parameters set to the <a href="https://docs.hebi.us/resources/gains/X5-4_STRATEGY4.xml">default parameters</a> provided for the modelled actuator <em>[30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001]</em> (values are PID for position, velocity and effort PID controllers). The output is smoothed using a PT2 block with parameters <em>kp=0.1</em>, <em>T=0.5</em> and <em>D=1</em> in order to mimick behaviour of the actuator's mechanical components.</p>
 
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell  jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set simulation time and discretisation</span>
+<span class="n">simTime</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">ts</span> <span class="o">=</span> <span class="mi">1</span><span class="o">/</span><span class="mi">100</span>
+<span class="n">samples</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">simTime</span><span class="o">*</span><span class="p">(</span><span class="mi">1</span><span class="o">/</span><span class="n">ts</span><span class="p">))</span>
+<span class="c1"># Set up time, input and feedback signals</span>
+<span class="n">time</span> <span class="o">=</span> <span class="p">[</span> <span class="n">i</span><span class="o">*</span><span class="n">ts</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">inSignal</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="p">[</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">feedback</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">samples</span><span class="p">)</span> <span class="p">]</span>
+<span class="c1"># Calculate output signal</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">strategy4Controller</span><span class="p">(</span>
+    <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">,</span>
+    <span class="n">constants</span> <span class="o">=</span> <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">0.001</span><span class="p">]</span>
+<span class="p">)</span>
+<span class="n">PT2</span> <span class="o">=</span> <span class="n">PT2Block</span><span class="p">(</span><span class="n">T</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">D</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">kp</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">ts</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="p">[</span> <span class="n">PT2</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">inSignal</span><span class="p">,</span> <span class="n">feedback</span><span class="p">)</span> <span class="p">]</span>
+<span class="c1"># Plot everything</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">inSignal</span><span class="p">)[:,</span><span class="mi">0</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Input&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">result</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Block Output&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;Time [s]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Strategy 4 Input and Output Position [rad]&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 <div class="jp-Cell-outputWrapper">
 <div class="jp-Collapser jp-OutputCollapser jp-Cell-outputCollapser">
 </div>
 
+
 <div class="jp-OutputArea jp-Cell-outputArea">
 
 <div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
 
 
 <div class="jp-RenderedSVG jp-OutputArea-output " data-mime-type="image/svg+xml">
@@ -19598,7 +19839,7 @@ L 296.620313 34.976562
   <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
    <cc:Work>
     <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
-    <dc:date>2022-02-11T12:03:40.883294</dc:date>
+    <dc:date>2022-02-12T17:56:53.543555</dc:date>
     <dc:format>image/svg+xml</dc:format>
     <dc:creator>
      <cc:Agent>
@@ -19634,12 +19875,12 @@ z
     <g id="xtick_1">
      <g id="line2d_1">
       <defs>
-       <path id="m279a0e82f7" d="M 0 0 
+       <path id="ma46179b941" d="M 0 0 
 L 0 3.5 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m279a0e82f7" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="58.999432" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_1">
@@ -19685,7 +19926,7 @@ z
     <g id="xtick_2">
      <g id="line2d_2">
       <g>
-       <use xlink:href="#m279a0e82f7" x="97.23607" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="97.23607" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_2">
@@ -19752,7 +19993,7 @@ z
     <g id="xtick_3">
      <g id="line2d_3">
       <g>
-       <use xlink:href="#m279a0e82f7" x="135.472707" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="135.472707" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_3">
@@ -19768,7 +20009,7 @@ z
     <g id="xtick_4">
      <g id="line2d_4">
       <g>
-       <use xlink:href="#m279a0e82f7" x="173.709345" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="173.709345" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_4">
@@ -19796,7 +20037,7 @@ z
     <g id="xtick_5">
      <g id="line2d_5">
       <g>
-       <use xlink:href="#m279a0e82f7" x="211.945983" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="211.945983" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_5">
@@ -19828,7 +20069,7 @@ z
     <g id="xtick_6">
      <g id="line2d_6">
       <g>
-       <use xlink:href="#m279a0e82f7" x="250.18262" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="250.18262" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_6">
@@ -19844,7 +20085,7 @@ z
     <g id="xtick_7">
      <g id="line2d_7">
       <g>
-       <use xlink:href="#m279a0e82f7" x="288.419258" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="288.419258" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_7">
@@ -19860,7 +20101,7 @@ z
     <g id="xtick_8">
      <g id="line2d_8">
       <g>
-       <use xlink:href="#m279a0e82f7" x="326.655896" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="326.655896" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_8">
@@ -19876,7 +20117,7 @@ z
     <g id="xtick_9">
      <g id="line2d_9">
       <g>
-       <use xlink:href="#m279a0e82f7" x="364.892534" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#ma46179b941" x="364.892534" y="224.64" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_9">
@@ -20042,12 +20283,12 @@ z
     <g id="ytick_1">
      <g id="line2d_10">
       <defs>
-       <path id="m5d31dab1f7" d="M 0 0 
+       <path id="m918598b621" d="M 0 0 
 L -3.5 0 
 " style="stroke: #000000; stroke-width: 0.8"/>
       </defs>
       <g>
-       <use xlink:href="#m5d31dab1f7" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m918598b621" x="43.78125" y="214.756364" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_11">
@@ -20062,7 +20303,7 @@ L -3.5 0
     <g id="ytick_2">
      <g id="line2d_11">
       <g>
-       <use xlink:href="#m5d31dab1f7" x="43.78125" y="175.221818" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m918598b621" x="43.78125" y="175.221818" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_12">
@@ -20077,7 +20318,7 @@ L -3.5 0
     <g id="ytick_3">
      <g id="line2d_12">
       <g>
-       <use xlink:href="#m5d31dab1f7" x="43.78125" y="135.687273" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m918598b621" x="43.78125" y="135.687273" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_13">
@@ -20113,7 +20354,7 @@ z
     <g id="ytick_4">
      <g id="line2d_13">
       <g>
-       <use xlink:href="#m5d31dab1f7" x="43.78125" y="96.152727" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m918598b621" x="43.78125" y="96.152727" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_14">
@@ -20160,7 +20401,7 @@ z
     <g id="ytick_5">
      <g id="line2d_14">
       <g>
-       <use xlink:href="#m5d31dab1f7" x="43.78125" y="56.618182" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m918598b621" x="43.78125" y="56.618182" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_15">
@@ -20216,7 +20457,7 @@ z
     <g id="ytick_6">
      <g id="line2d_15">
       <g>
-       <use xlink:href="#m5d31dab1f7" x="43.78125" y="17.083636" style="stroke: #000000; stroke-width: 0.8"/>
+       <use xlink:href="#m918598b621" x="43.78125" y="17.083636" style="stroke: #000000; stroke-width: 0.8"/>
       </g>
      </g>
      <g id="text_16">
@@ -20599,7 +20840,7 @@ z
 L 60.528897 17.083636 
 L 363.363068 17.083636 
 L 363.363068 17.083636 
-" clip-path="url(#pcdff18976b)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
+" clip-path="url(#p5e9aab7f69)" style="fill: none; stroke-dasharray: 1.5,2.475; stroke-dashoffset: 0; stroke: #1f77b4; stroke-width: 1.5"/>
    </g>
    <g id="line2d_17">
     <path d="M 58.999432 214.756364 
@@ -20644,7 +20885,7 @@ L 215.004914 17.173999
 L 251.712086 17.093589 
 L 363.363068 17.083647 
 L 363.363068 17.083647 
-" clip-path="url(#pcdff18976b)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
+" clip-path="url(#p5e9aab7f69)" style="fill: none; stroke: #ff7f0e; stroke-width: 1.5; stroke-linecap: square"/>
    </g>
    <g id="patch_3">
     <path d="M 43.78125 224.64 
@@ -20805,7 +21046,7 @@ L 296.620313 210.060312
   </g>
  </g>
  <defs>
-  <clipPath id="pcdff18976b">
+  <clipPath id="p5e9aab7f69">
    <rect x="43.78125" y="7.2" width="334.8" height="217.44"/>
   </clipPath>
  </defs>
@@ -20819,7 +21060,21 @@ L 296.620313 210.060312
 
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs jp-mod-noInput ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[&nbsp;]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
 
 </div>
 </body>

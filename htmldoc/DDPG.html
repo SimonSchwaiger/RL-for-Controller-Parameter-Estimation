@@ -921,17 +921,30 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 | The full license is in the file LICENSE, distributed with this software.
 |----------------------------------------------------------------------------*/
 
+/* Changes made here to give the jupyterlab template a more classic notebook look */
+
 @charset "UTF-8";
 html{
   -webkit-box-sizing:border-box;
-          box-sizing:border-box; }
+          box-sizing:border-box; 
+          max-width: 1100px;
+          margin: auto;
+          padding-top: 30px;
+          padding-bottom: 30px;
+          padding-right: 40px;
+          padding-left: 0px;
+          border-style: solid;
+          border-width: 1px;
+          border-color: rgb(255, 255, 255);
+          box-shadow: 0px 0px 8px 8px rgba(146, 146, 146, 0.288); /*
+          filter: drop-shadow(0 0 0.75rem rgb(75, 75, 75)); */ }
 
 *,
 *::before,
 *::after{
   -webkit-box-sizing:inherit;
-          box-sizing:inherit; }
-
+          box-sizing:inherit;}
+/* End of changes */
 body{
   font-size:14px;
   font-weight:400;
@@ -14055,6 +14068,14 @@ div.jp-Cell-Placeholder-content-2 {
 div.jp-Cell-Placeholder-content-3 {
   top: 140px;
 }
+
+
+
+
+
+
+
+
 
 </style>
 
