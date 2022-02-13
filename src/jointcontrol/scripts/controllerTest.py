@@ -36,12 +36,13 @@ class controllerTest:
             obs, reward, done, _ = env.step(action)
             episodeRewards.append(reward)
         #
-        print("testepisode done")
+        print("Testepisode done. Resulting params are {}".format(finalObs))
         ## Test normal step response
         # Set up env for step response, set optimal params and run episode
         obs = env.reset() 
         env.env.currentParams = finalObs
-        env.step([ 0 for _ in action ])
+        # Run episode without changing params
+        env.step(None)
         stepTrajectory = copy.deepcopy(env.env.latestTrajectory)
         stepControlSignal = copy.deepcopy(env.env.controlSignal)
         #
@@ -70,7 +71,7 @@ class controllerTest:
             # Set testing params and perform step
             env.env.currentParams = finalObs
             print(config)
-            env.step([ 0 for _ in action ])
+            env.step(None)
             # Store resulting trajectories
             squareTrajectories.append(env.env.latestTrajectory)
         #
@@ -97,7 +98,7 @@ class controllerTest:
         """
         Serialises test results in order to save them as json format. 
         
-        This method is required, since json cannot serialise dicts containing numpy arrays
+        This method is required, since json cannot serialise dicts containing numpy arrays.
         """
         data = copy.deepcopy(self.testResults)
         #
@@ -108,7 +109,14 @@ class controllerTest:
         return data
     #
     def plotResults(self, gui=False, outpath=None):
-        """ Plots test results stored in self.testResults """
+        """ 
+        Plots test results stored in self.testResults 
+        
+        Params:
+            - gui:      If True, a testreport will be plotted using matplotlib.
+            - outpath:  If set, the testreport and raw test data will be saved at the path's location.
+                        The report is saved as a pdf, while the data is stored in json format.
+        """
         # Create Matplotlib figure and set title
         fig, axs = plt.subplots(3, 1, constrained_layout=True, gridspec_kw={'height_ratios': [1, 1, 2]})
         fig.suptitle("Testreport for {}".format(self.testResults["modelname"]))
@@ -123,14 +131,15 @@ class controllerTest:
         #
         # Resulting trajectory and control signal of step response
         axs[1].plot (
+            np.arange(len(self.testResults["stepControlSignal"]))*self.testResults["ts"],
+            self.testResults["stepControlSignal"],
+            label = "Control Signal",
+            linestyle=":"
+        )
+        axs[1].plot (
             np.arange(len(self.testResults["stepTrajectory"]))*self.testResults["ts"],
             self.testResults["stepTrajectory"],
             label = "Resulting Position"
-        )
-        axs[1].plot (
-            np.arange(len(self.testResults["stepControlSignal"]))*self.testResults["ts"],
-            self.testResults["stepControlSignal"],
-            label = "Control Signal"
         )
         axs[1].legend()
         axs[1].set_xlabel("Time [s]")

@@ -23,12 +23,16 @@ cp -r index.css /root/myenv/share/jupyter/nbconvert/templates//lab/static/
 
 # Generate HTML Notebooks from ipynb
 jupyter nbconvert --execute --to html --template lab testControllerBlocks.ipynb
-jupyter nbconvert --to html --template lab DDPG.ipynb
 jupyter nbconvert --execute --to html --template lab documentation.ipynb
+jupyter nbconvert --to html --template lab DDPG.ipynb
+jupyter nbconvert --to html --template lab DQN.ipynb
+jupyter nbconvert --to html --template lab PPO1.ipynb
 
 # Move all files to the right destinations
 mv testControllerBlocks.html /app/htmldoc
 mv DDPG.html /app/htmldoc
+mv DQN.html /app/htmldoc
+mv PPO1.html /app/htmldoc
 mv documentation.html /app
 
 cd /app

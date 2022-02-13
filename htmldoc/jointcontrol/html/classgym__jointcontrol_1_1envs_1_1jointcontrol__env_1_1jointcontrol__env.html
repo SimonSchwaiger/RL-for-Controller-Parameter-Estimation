@@ -197,7 +197,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Scales action from [-1, 1] to physical controller params </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00275">275</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00277">277</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -241,7 +241,7 @@ Public Attributes</h2></td></tr>
 <pre class="fragment">Computes reward of currently achieved vs. the global goal 
 
 In this context, the achieved goal is the actual plant position, while the actual goal is to follow the control signal as closely as possible</pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00256">256</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00258">258</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -261,7 +261,7 @@ In this context, the achieved goal is the actual plant position, while the actua
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Formats observation </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00270">270</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00272">272</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -281,7 +281,7 @@ In this context, the achieved goal is the actual plant position, while the actua
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Returns Jointstate in form [pos, vel, effort] </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00289">289</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00291">291</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -301,7 +301,7 @@ In this context, the achieved goal is the actual plant position, while the actua
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Reloads jointparams from ROS in order to enable changing of the testscene without terminating the env </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00306">306</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00308">308</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -331,7 +331,7 @@ In this context, the achieved goal is the actual plant position, while the actua
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Scales controller params to action space of [-1, 1] </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00282">282</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00284">284</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -367,7 +367,7 @@ In this context, the achieved goal is the actual plant position, while the actua
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Sets up position control for the next physics update </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00295">295</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00297">297</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -397,7 +397,7 @@ In this context, the achieved goal is the actual plant position, while the actua
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00250">250</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00252">252</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -457,7 +457,7 @@ performs response to a square input signal
     - numPulses:                Number of performed pulses
     - maxSteps [int]:           Number of performed step responses per episode
 
-generator (TODO):
+generator:
 performs a custom response (a generator object is provided in config)
     - inSignal [generator]      Generator object for generaring control signal
     - maxSteps [int]:           Number of performed step responses per episode
@@ -465,7 +465,7 @@ performs a custom response (a generator object is provided in config)
 Switching between types of control signals is implemented using a dict and each episodeType is implemented as its own method.
 In order to use any response other than 'step', the reset method must be called as env.env.reset(episodeType=.., config=..) instead of env.reset() due to how Gym's inheritance is implemented.
 </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00164">164</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00166">166</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -494,7 +494,10 @@ In order to use any response other than 'step', the reset method must be called 
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">Performs one simulation (as defined with episodeType and config params in env.reset()) </pre> 
+<pre class="fragment">Performs one simulation (as defined with episodeType and config params in env.reset()).
+
+If action is set to None, a step is performed without changing internal params of the controller.
+</pre> 
 <p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00088">88</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
@@ -525,7 +528,7 @@ In order to use any response other than 'step', the reset method must be called 
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Callback for synchronisation messages </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00311">311</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00313">313</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -555,7 +558,7 @@ In order to use any response other than 'step', the reset method must be called 
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Sets up torque control for the next physics update </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00301">301</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00303">303</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -575,7 +578,7 @@ In order to use any response other than 'step', the reset method must be called 
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Plots control signal vs. resulting trajectory using matplotlib </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00326">326</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00328">328</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -595,7 +598,7 @@ In order to use any response other than 'step', the reset method must be called 
       </table>
 </div><div class="memdoc">
 <pre class="fragment">Synchronises env with physics server using ROS messages </pre> 
-<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00316">316</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
+<p class="definition">Definition at line <a class="el" href="jointcontrol__env_8py_source.html#l00318">318</a> of file <a class="el" href="jointcontrol__env_8py_source.html">jointcontrol_env.py</a>.</p>
 
 </div>
 </div>
@@ -865,7 +868,7 @@ In order to use any response other than 'step', the reset method must be called 
 <hr size="1"><div style="align: right;">
 <a href="http://wiki.ros.org/jointcontrol">jointcontrol</a><br />
 Author(s): </br />
-<small>autogenerated on Sat Feb 12 2022 18:29:53</small>
+<small>autogenerated on Sun Feb 13 2022 16:02:36</small>
 </div>
 </body>
 </html>

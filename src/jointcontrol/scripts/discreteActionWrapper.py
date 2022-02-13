@@ -36,13 +36,19 @@ class jointcontrolDiscrete(gym.Wrapper):
             3 -> increment param 2
             4 -> decrement param 2
             ...
-        """        
-        # Make sure inputted action is valid and can be decoded
-        assert action < self.numParams*2
-        # Create list of param changes based on discretisation and param size
-        if action%2 == 0: tmp = self.discretisation
-        else: tmp = -self.discretisation
-        actionList = [ 0 for _ in range(self.numParams) ]
-        actionList[int(action/2)] = tmp
+
+        If action is set to None, a step is performed without changing internal params of the controller.
+        """
+        if action==None :
+            # If action is none, perform step with action as None to not change params
+            actionList = None
+        else:
+            # Make sure inputted action is valid and can be decoded
+            assert action < self.numParams*2
+            # Create list of param changes based on discretisation and param size
+            if action%2 == 0: tmp = self.discretisation
+            else: tmp = -self.discretisation
+            actionList = [ 0 for _ in range(self.numParams) ]
+            actionList[int(action/2)] = tmp
         # Perform step in non-discrete env and return observation
         return self.env.step(actionList)

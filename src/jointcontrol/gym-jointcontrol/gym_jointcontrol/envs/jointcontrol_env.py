@@ -86,23 +86,25 @@ class jointcontrol_env(gym.Env):
     # Gym Env methods
     # ----------------------------
     def step(self, action):
-        """ Performs one simulation (as defined with episodeType and config params in env.reset()) """
+        """
+        Performs one simulation (as defined with episodeType and config params in env.reset()).
+
+        If action is set to None, a step is performed without changing internal params of the controller.
+        """
+        # An action of none corresponds to changes of 0 for each param
+        if np.any(action == None): action = [ 0 for _ in self.jointParams["Defaults"] ]
 
         # If action is not within action space, terminate the episode and return
         if False in [ -1 <= a <= 1 for a in action ]:
             return self.formatObs(), -10, True, {} 
 
-        # Scale action from [-1, 1] back to params
-        #action = np.multiply(
-        #    np.array(action), 
-        #    np.array(self.jointParams["MaxChange"], dtype=np.float64)
-        #)
         action = self.actionToParams(action)
 
         # Calculate current controller params after action
         self.currentParams += np.array(action)
 
         # If action puts the state outside of the observation space, terminate episode and return
+        # This test is deactivated for now, until more sophisticated model testing
         #if False in [ a <= b <= c for a, b, c in zip(self.jointParams["Minimums"], self.currentParams, self.jointParams["Maximums"]) ]:
         #    return self.formatObs(), -10, True, {} 
 
@@ -188,7 +190,7 @@ class jointcontrol_env(gym.Env):
             - numPulses:                Number of performed pulses
             - maxSteps [int]:           Number of performed step responses per episode
 
-        generator (TODO):
+        generator:
         performs a custom response (a generator object is provided in config)
             - inSignal [generator]      Generator object for generaring control signal
             - maxSteps [int]:           Number of performed step responses per episode

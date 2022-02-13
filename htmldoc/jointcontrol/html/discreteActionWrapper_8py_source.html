@@ -63,16 +63,22 @@ $(function() {
 <div class="line"><a name="l00036"></a><span class="lineno">   36</span>&#160;<span class="stringliteral">            3 -&gt; increment param 2</span></div>
 <div class="line"><a name="l00037"></a><span class="lineno">   37</span>&#160;<span class="stringliteral">            4 -&gt; decrement param 2</span></div>
 <div class="line"><a name="l00038"></a><span class="lineno">   38</span>&#160;<span class="stringliteral">            ...</span></div>
-<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span>        </div>
-<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;        <span class="comment"># Make sure inputted action is valid and can be decoded</span></div>
-<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;        <span class="keyword">assert</span> action &lt; self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a28144269aa9b27f06aa6bba4f6740d6d">numParams</a>*2</div>
-<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="comment"># Create list of param changes based on discretisation and param size</span></div>
-<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;        <span class="keywordflow">if</span> action%2 == 0: tmp = self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a9b2035c353a625e30fc564adc2051e7d">discretisation</a></div>
-<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;        <span class="keywordflow">else</span>: tmp = -self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a9b2035c353a625e30fc564adc2051e7d">discretisation</a></div>
-<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        actionList = [ 0 <span class="keywordflow">for</span> _ <span class="keywordflow">in</span> range(self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a28144269aa9b27f06aa6bba4f6740d6d">numParams</a>) ]</div>
-<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;        actionList[int(action/2)] = tmp</div>
-<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;        <span class="comment"># Perform step in non-discrete env and return observation</span></div>
-<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;        <span class="keywordflow">return</span> self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a16d5bdffea4eba10708f25e45e407ac3">env</a>.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a2a7290a3e6303bc6e353d4da214515cd">step</a>(actionList)</div>
+<div class="line"><a name="l00039"></a><span class="lineno">   39</span>&#160;<span class="stringliteral"></span> </div>
+<div class="line"><a name="l00040"></a><span class="lineno">   40</span>&#160;<span class="stringliteral">        If action is set to None, a step is performed without changing internal params of the controller.</span></div>
+<div class="line"><a name="l00041"></a><span class="lineno">   41</span>&#160;<span class="stringliteral">        &quot;&quot;&quot;</span></div>
+<div class="line"><a name="l00042"></a><span class="lineno">   42</span>&#160;        <span class="keywordflow">if</span> action==<span class="keywordtype">None</span> :</div>
+<div class="line"><a name="l00043"></a><span class="lineno">   43</span>&#160;            <span class="comment"># If action is none, perform step with action as None to not change params</span></div>
+<div class="line"><a name="l00044"></a><span class="lineno">   44</span>&#160;            actionList = <span class="keywordtype">None</span></div>
+<div class="line"><a name="l00045"></a><span class="lineno">   45</span>&#160;        <span class="keywordflow">else</span>:</div>
+<div class="line"><a name="l00046"></a><span class="lineno">   46</span>&#160;            <span class="comment"># Make sure inputted action is valid and can be decoded</span></div>
+<div class="line"><a name="l00047"></a><span class="lineno">   47</span>&#160;            <span class="keyword">assert</span> action &lt; self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a28144269aa9b27f06aa6bba4f6740d6d">numParams</a>*2</div>
+<div class="line"><a name="l00048"></a><span class="lineno">   48</span>&#160;            <span class="comment"># Create list of param changes based on discretisation and param size</span></div>
+<div class="line"><a name="l00049"></a><span class="lineno">   49</span>&#160;            <span class="keywordflow">if</span> action%2 == 0: tmp = self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a9b2035c353a625e30fc564adc2051e7d">discretisation</a></div>
+<div class="line"><a name="l00050"></a><span class="lineno">   50</span>&#160;            <span class="keywordflow">else</span>: tmp = -self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a9b2035c353a625e30fc564adc2051e7d">discretisation</a></div>
+<div class="line"><a name="l00051"></a><span class="lineno">   51</span>&#160;            actionList = [ 0 <span class="keywordflow">for</span> _ <span class="keywordflow">in</span> range(self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a28144269aa9b27f06aa6bba4f6740d6d">numParams</a>) ]</div>
+<div class="line"><a name="l00052"></a><span class="lineno">   52</span>&#160;            actionList[int(action/2)] = tmp</div>
+<div class="line"><a name="l00053"></a><span class="lineno">   53</span>&#160;        <span class="comment"># Perform step in non-discrete env and return observation</span></div>
+<div class="line"><a name="l00054"></a><span class="lineno">   54</span>&#160;        <span class="keywordflow">return</span> self.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a16d5bdffea4eba10708f25e45e407ac3">env</a>.<a class="code" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a2a7290a3e6303bc6e353d4da214515cd">step</a>(actionList)</div>
 </div><!-- fragment --></div><!-- contents -->
 <div class="ttc" id="aclassdiscreteActionWrapper_1_1jointcontrolDiscrete_html_a3e8278c1554d3b4422bb7da612237bcf"><div class="ttname"><a href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a3e8278c1554d3b4422bb7da612237bcf">discreteActionWrapper.jointcontrolDiscrete.__init__</a></div><div class="ttdeci">None __init__(self, env, discretisation=0.5)</div><div class="ttdef"><b>Definition:</b> <a href="discreteActionWrapper_8py_source.html#l00007">discreteActionWrapper.py:7</a></div></div>
 <div class="ttc" id="aclassdiscreteActionWrapper_1_1jointcontrolDiscrete_html_a16d5bdffea4eba10708f25e45e407ac3"><div class="ttname"><a href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a16d5bdffea4eba10708f25e45e407ac3">discreteActionWrapper.jointcontrolDiscrete.env</a></div><div class="ttdeci">env</div><div class="ttdef"><b>Definition:</b> <a href="discreteActionWrapper_8py_source.html#l00022">discreteActionWrapper.py:22</a></div></div>
@@ -86,7 +92,7 @@ $(function() {
 <hr size="1"><div style="align: right;">
 <a href="http://wiki.ros.org/jointcontrol">jointcontrol</a><br />
 Author(s): </br />
-<small>autogenerated on Sat Feb 12 2022 18:29:53</small>
+<small>autogenerated on Sun Feb 13 2022 16:02:36</small>
 </div>
 </body>
 </html>
