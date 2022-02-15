@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+""" These classes implement discrete approximations of the tested controllers. """
+
 def clampValue(val, valMax):
     """ Makes sure that a value is within [-valMax, valMax] """
     if valMax == None: return val
@@ -144,7 +146,12 @@ class PT2Block:
         return y[0]
 
 class smartPID:
-    """!@brief Implementation to mimick HEBI PID controller behaviour. Variable names are consistent with HEBI Gains format """
+    """!@brief Implementation to approximate HEBI PID controller behaviour. Variable names are consistent with HEBI Gains format 
+    
+    This approximation of HEBI controller and gains is based on their documentation of control strategy 4 (1) and controller gains documentation (2)
+    1) https://docs.hebi.us/core_concepts.html#control-strategies
+    2) https://docs.hebi.us/core_concepts.html#controller_gains 
+    """
     def __init__(self, kp=0, ki=0, kd=0, targetLP=0, outputLP=0, ts=0, feedforward=0, d_on_error=True, targetMax=None, outputMax=None) -> None:
         self.d_on_error = d_on_error
         if d_on_error:
@@ -194,7 +201,10 @@ class smartPID:
         return output
         
 class strategy4Controller:
-    """!@brief Models HEBI control strategy 4 using 3 PID controllers discretised using the Tustin approximation """
+    """!@brief Models HEBI control strategy 4 using 3 PID controllers discretised using the Tustin approximation 
+    
+    This approximation of the HEBI controller is based on HEBI's documentation: https://docs.hebi.us/core_concepts.html#control-strategies
+    """
     def __init__(self, ts=0, targetConstraints=[None, 3.43, 20], outputConstraints=[10, 1, 1], feedfowards=[0, 1, 1], d_on_errors=[True, True, False], constants=None) -> None:
         """ Class constructor """
         self.ts = ts
@@ -243,12 +253,11 @@ class strategy4Controller:
         return self.PWMFilter.update(PWM1 + PWM2)
 
 def PWM2Torque(PWM, maxMotorTorque=7.5):
-    """ Converts PWM output signals of the strategy 4 controller to direct torque outputs (Nm) for Pybullet """
+    """ Converts PWM output signals of the strategy 4 controller to direct torque output (Nm) """
     # PWM range -> [-1, 1], Since we have X5-4 motors, the max torque is 7.5 Nm
-    # We just assume the conversion to be linear, might be fancier if I have time to measure a more exact conversion
-    # Source: https://docs.hebi.us/core_concepts.html#control-strategies
+    # The conversion is assumed to be linear for this implementation, this should yield enough accuracy for the tested scenarios
     return PWM*maxMotorTorque
 
 def deserialiseJointstate(js):
-    """ Converts Jointstate message into the format used for the strategy 4 controller """
+    """ Unpacks JointState type to list of [position, velocity, effffort] for each joint """
     return [ [pos, vel, eff] for pos, vel, eff in zip(js.position, js.velocity, js.effort) ]

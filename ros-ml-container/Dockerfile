@@ -1,3 +1,5 @@
+# Dockerfile based on: https://github.com/SimonSchwaiger/ros-ml-container
+
 # default platform = no gpu acceleration
 # possible values are cpu (no acceleration), opensource (intel and amd open-source), amdpro (amdgpu-pro), nvidia (container-toolkit)
 ARG GRAPHICS_PLATFORM=cpu

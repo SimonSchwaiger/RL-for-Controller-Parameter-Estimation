@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+""" The classes in this file instantiate, configure and synchronise the shared Bullet simulation.  """
+
 # Pybullet components
 from ntpath import join
 import pybullet as p

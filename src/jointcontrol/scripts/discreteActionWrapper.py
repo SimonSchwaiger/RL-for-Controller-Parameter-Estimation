@@ -1,3 +1,7 @@
+#!/usr/bin/env python3
+
+""" This class allows discretisation of the jointcontrol environment's action space. """
+
 import gym
 from gym import spaces
 import gym_jointcontrol

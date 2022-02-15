@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+""" This class performs automated controller model testing using the Gym environment and physics simulation. """
+
 import copy
 import os
 import json

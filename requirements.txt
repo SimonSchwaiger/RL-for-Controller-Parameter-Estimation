@@ -1,3 +1,4 @@
+# This file determines, which Python modules are installed in the container
 numpy
 sympy
 scipy

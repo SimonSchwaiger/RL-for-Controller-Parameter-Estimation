@@ -1,4 +1,7 @@
 #!/bin/bash
+
+# Build script based on: https://github.com/SimonSchwaiger/ros-ml-container
+
 # set environment variable for graphics acceleration in the container
 # possible values are cpu (no acceleration), opensource (intel and amd open-source), amdpro (amdgpu-pro), nvidia (container-toolkit)
 # if GRAPHICS_PLATFORM is null or not set, use cpu
