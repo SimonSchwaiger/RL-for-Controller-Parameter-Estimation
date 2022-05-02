@@ -6,6 +6,7 @@ import time
 import copy
 import sys
 import numpy as np
+from scipy import stats
 import matplotlib.pyplot as plt
 
 import rospy
@@ -63,6 +64,7 @@ class jointcontrol_env(gym.Env):
         self.numSteps = 0                       # Number of performed steps this episode
         self.maxSteps = 0                       # Maximum number of steps per episode
         self.latestTrajectory = None            # Stores the trajectory resulting from the latest sim step
+        self.latestControllerOutput = None      # Stores the controller output [Nm] from the latest sim step
         self.ts = params["SimParams"]["Ts"]     # Stores time discretisation in order to properly visualise trajectories
 
         # Connect to the bullet server
@@ -103,11 +105,6 @@ class jointcontrol_env(gym.Env):
         # Calculate current controller params after action
         self.currentParams += np.array(action)
 
-        # If action puts the state outside of the observation space, terminate episode and return
-        # This test is deactivated for now, until more sophisticated model testing
-        #if False in [ a <= b <= c for a, b, c in zip(self.jointParams["Minimums"], self.currentParams, self.jointParams["Maximums"]) ]:
-        #    return self.formatObs(), -10, True, {} 
-
         # Clip controller params to Min/Max
         np.clip(
             self.currentParams,
@@ -128,6 +125,7 @@ class jointcontrol_env(gym.Env):
         self.controllerInstance.updateConstants(self.currentParams)
 
         resultingPos = []                   # Variable to track resulting motor position
+        actuatorTorque = []                 # Variable to track applied actuator torque
         feedback = self.getJointState()     # Variable to track bullet joint feedback
 
         # Iterate over controlsignal
@@ -138,6 +136,9 @@ class jointcontrol_env(gym.Env):
                 self.controllerInstance.update([entry, 0, 0], feedback),
                 maxMotorTorque=self.jointParams["MaxTorque"]
             )
+            # Track applied torque
+            actuatorTorque.append(torque)
+            # Perform control update
             self.torqueControlUpdate(torque)
             # Wait for synchronisation
             self.waitForPhysicsUpdate()
@@ -150,8 +151,9 @@ class jointcontrol_env(gym.Env):
         # Calculate reward
         reward = self.compute_reard(resultingPos, self.controlSignal, {})
 
-        # Keep track of resulting trajectory
+        # Keep track of resulting trajectory and applied torque signals
         self.latestTrajectory = resultingPos
+        self.latestControllerOutput = actuatorTorque
 
         # Check if end of episode is reached
         if self.numSteps < self.maxSteps:
@@ -247,6 +249,10 @@ class jointcontrol_env(gym.Env):
 
         # Set perfomed steps for this episode to 0 and return
         self.numSteps = 0
+        
+        # Perform step to populate features required for obs
+        self.step(None)
+
         return self.formatObs()
 
     def render(self, mode="human"):
@@ -271,8 +277,22 @@ class jointcontrol_env(gym.Env):
     # ----------------------------
     def formatObs(self):
         """ Formats observation """
-        obs = self.currentParams
-        return obs
+        def getSignalFeatures(arr):
+            return np.array([
+                min(arr),
+                max(arr),
+                np.mean(arr),
+                stats.skew(arr),
+                stats.kurtosis(arr)
+            ])
+
+        obs = []
+        obs.extend(self.currentParams)
+        obs.extend(getSignalFeatures(self.controlSignal))
+        obs.extend(getSignalFeatures(self.latestControllerOutput))
+        obs.extend(getSignalFeatures(self.latestTrajectory))
+
+        return np.array(obs, dtype=np.float64)
 
     def actionToParams(self, action):
         """ Scales action from [-1, 1] to physical controller params """

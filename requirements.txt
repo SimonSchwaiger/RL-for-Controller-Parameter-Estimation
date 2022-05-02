@@ -10,5 +10,5 @@ seaborn
 pandas
 pybullet
 jupyterlab
-stable-baselines[mpi]
-tensorflow==1.15
+stable-baselines3
+tensorboard
