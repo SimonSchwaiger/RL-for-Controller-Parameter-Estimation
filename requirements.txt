@@ -12,3 +12,4 @@ pybullet
 jupyterlab
 stable-baselines3
 tensorboard
+parse

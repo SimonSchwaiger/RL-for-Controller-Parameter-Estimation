@@ -34,4 +34,4 @@ cp requirements.txt ros-ml-container/requirements.txt
 # Port 6006 is forwarded to allow for the tensorboard gui to be displayed on the host
 # Port 8888 is forwarded for jupyter lab
 cd ros-ml-container
-GRAPHICS_PLATFORM=$GRAPHICS_PLATFORM PYTHONVER=3.8 DOCKER_RUN_ARGS="-p 6006:6006 -p 8888:8888" ./buildandrun.sh
+GRAPHICS_PLATFORM=$GRAPHICS_PLATFORM PYTHONVER=3.8 DOCKER_RUN_ARGS="-p 6006:6006 -p 8888:8888" CONTAINER_NAME="ros_ml_container1" ./buildandrun.sh

@@ -21,9 +21,9 @@ python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcon
 
 ## Start shared memory physics server
 # Headless
-/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory &
+#/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory &
 # With GUI
-#/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory_GUI &
+/bullet/bullet3-3.21/build_cmake/examples/SharedMemory/App_PhysicsServer_SharedMemory_GUI &
 sleep 1
 
 ## Connect to the server, load robots and set up synchronisation between envs
@@ -40,4 +40,5 @@ export JUPYTER_TOKEN=docker
 jupyter-lab --ip 0.0.0.0 -NotebookApp.token='smart_control' --no-browser --allow-root &
 
 # Start interactive shell to sit idle and keep everything running
-bash
+#bash
+python

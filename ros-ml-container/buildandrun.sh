@@ -8,6 +8,7 @@
 GRAPHICS_PLATFORM="${GRAPHICS_PLATFORM:-cpu}"
 PYTHONVER="${PYTHONVER:-3.8}"
 DOCKER_RUN_ARGS="${DOCKER_RUN_ARGS:}"
+CONTAINER_NAME="${CONTAINER_NAME:-ros_ml_container}"
 
 # check if src folder exists, if not it will be created
 mkdir -p src
@@ -45,7 +46,7 @@ if [ "$GRAPHICS_PLATFORM" == "nvidia" ]; then
                 --privileged \
                 --network host \
                 --rm \
-                --name ros_ml_container \
+                --name $CONTAINER_NAME \
                 -e DISPLAY=$DISPLAY \
                 -v /tmp/.X11-unix:/tmp/.X11-unix \
                 -v "$PWD/app":/app \
@@ -56,7 +57,7 @@ elif [ "$GRAPHICS_PLATFORM" == "cpu" ]; then
     # run normally, without passing through any devices
     docker run -it \
                 --rm \
-                --name ros_ml_container \
+                --name $CONTAINER_NAME \
                 -e DISPLAY=$DISPLAY \
                 -v /tmp/.X11-unix:/tmp/.X11-unix \
                 -v "$PWD/app":/app \
@@ -67,7 +68,7 @@ elif [ "$GRAPHICS_PLATFORM" == "amdpro" ]; then
     # run container in normal mode but pass through dri and kfd devices
     docker run -it \
                 --rm \
-                --name ros_ml_container \
+                --name $CONTAINER_NAME \
                 -e DISPLAY=$DISPLAY \
                 -v /tmp/.X11-unix:/tmp/.X11-unix \
                 -v "$PWD/app":/app \
@@ -81,7 +82,7 @@ elif [ "$GRAPHICS_PLATFORM" == "wsl2" ]; then
     # https://fossbytes.com/directx-on-linux-wsl2-support-windows-10/
         docker run -it \
                 --rm \
-                --name ros_ml_container \
+                --name $CONTAINER_NAME \
                 --privileged \
                 -e DISPLAY=$DISPLAY \
                 --device=/dev/dri:/dev/dri \
@@ -95,7 +96,7 @@ else
     # run container in normal mode but pass through dri device
     docker run -it \
                 --rm \
-                --name ros_ml_container \
+                --name $CONTAINER_NAME \
                 -e DISPLAY=$DISPLAY \
                 -v /tmp/.X11-unix:/tmp/.X11-unix \
                 -v "$PWD/app":/app \
