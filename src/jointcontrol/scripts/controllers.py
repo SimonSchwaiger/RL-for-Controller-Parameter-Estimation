@@ -205,7 +205,7 @@ class strategy4Controller:
     
     This approximation of the HEBI controller is based on HEBI's documentation: https://docs.hebi.us/core_concepts.html#control-strategies
     """
-    def __init__(self, ts=0, targetConstraints=[None, 3.43, 20], outputConstraints=[10, 1, 1], feedfowards=[0, 1, 1], d_on_errors=[True, True, False], constants=None) -> None:
+    def __init__(self, ts=0, targetConstraints=[None, 1.502675, 20], outputConstraints=[10, 1, 1], feedfowards=[0, 1, 1], d_on_errors=[True, True, False], constants=None) -> None:
         """ Class constructor """
         self.ts = ts
         #
@@ -221,7 +221,8 @@ class strategy4Controller:
             outputMax=outputConstraints[1],
             feedforward=feedfowards[1],
             d_on_error=d_on_errors[1],
-            outputLP=0.01
+            outputLP=0.001
+            #outputLP=0.01
         )
         #
         self.EffortPID = smartPID(
@@ -229,10 +230,12 @@ class strategy4Controller:
             outputMax=outputConstraints[2],
             feedforward=feedfowards[2],
             d_on_error=d_on_errors[2],
-            outputLP=0.001
+            outputLP=0.02
+            #outputLP=0.025
         )
         #
-        self.PWMFilter = PT2Block(kp=1, T=0.0, D=10, ts=self.ts)
+        #self.PWMFilter = PT2Block(kp=1, T=0.0, D=1, ts=self.ts)
+        #self.PWMFilter = PT1Block(kp=1, T1=0.1)
         if constants != None: self.updateConstants(constants)
     #
     def updateConstants(self, constants):
@@ -250,7 +253,10 @@ class strategy4Controller:
         effort = self.PositionPID.update(vecIn[0], feedback[0])
         PWM1 = self.EffortPID.update(vecIn[2] + effort, feedback[2])
         PWM2 = self.VelocityPID.update(vecIn[2], feedback[2])
-        return self.PWMFilter.update(PWM1 + PWM2)
+        # Clamp output to [0,1]
+        return clampValue(PWM1 + PWM2, 1)
+        #return self.PWMFilter.update(clampValue(PWM1 + PWM2, 1))
+        #return clampValue(self.PWMFilter.update(PWM1 + PWM2), 1)
 
 def PWM2Torque(PWM, maxMotorTorque=7.5):
     """ Converts PWM output signals of the strategy 4 controller to direct torque output (Nm) """

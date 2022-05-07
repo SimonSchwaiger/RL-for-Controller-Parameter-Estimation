@@ -1,5 +1,8 @@
 ## Imports
 import matplotlib.pyplot as plt
+import matplotlib
+
+matplotlib.style.use("default")
 
 # Import discrete controllers
 import sys
@@ -53,9 +56,9 @@ inSignal = [0] + [ 1 for _ in range(samples-1) ]
 
 #ax0.set_xlabel("Time[s]")
 #ax1.set_xlabel("Time[s]")
-ax2.set_xlabel("Time[s]")
+ax2.set_xlabel("Time [sec]")
 
-ax0.set_ylabel("PT1 Open Loop")
+ax0.set_ylabel("T1 Open Loop")
 ax1.set_ylabel("D-T1 Open Loop")
 ax2.set_ylabel("PID-T1 Closed Loop")
 
@@ -150,6 +153,6 @@ set_size(7,5)
 
 plt.tight_layout()
 
-plt.savefig("/app/resultsApproximatedTransferFunctionStep.pdf")
+#plt.savefig("/app/resultsApproximatedTransferFunctionStep.pdf")
 plt.show()
 

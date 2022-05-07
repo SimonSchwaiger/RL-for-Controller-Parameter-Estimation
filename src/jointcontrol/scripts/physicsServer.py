@@ -3,7 +3,9 @@
 """ The classes in this file instantiate, configure and synchronise the shared Bullet simulation.  """
 
 # Pybullet components
+from asyncore import read
 from ntpath import join
+from turtle import update
 import pybullet as p
 import pybullet_data
 
@@ -14,6 +16,38 @@ from jointcontrol.msg import jointMetric
 # Misc
 import numpy as np
 import time
+import copy
+import parse
+
+import sys
+sys.path.append("/catkin_ws/src/jointcontrol/scripts")
+from sharedMemJointMetric import *
+
+performanceDebug = False
+
+class performanceTimer:
+    """ Tracks exection time of code segments """
+    def __init__(self) -> None:
+        self.stamps = []
+        self.names = []
+        self.reset()
+    #
+    def reset(self):
+        self.stamps = []
+        self.names = []
+        self.addTimestamp()
+    #
+    def addTimestamp(self, name=None):
+        self.stamps.append(time.time())
+        if name == None: self.names.append("{}".format(len(self.names)))
+        else: self.names.append(name)
+    #
+    def printSummary(self):
+        self.stamps[0]
+        print("Relative time [sec] from first timestamp: \n")
+        for stamp, stampName in zip(self.stamps[1:], self.names[1:]):
+            print("{:2.6f}    {}".format(stamp-self.stamps[0], stampName))
+        print(" ")
 
 def from_s(idx, a):
     """ Returns x and y coordinates of the indexed item in a square with length a """
@@ -21,14 +55,27 @@ def from_s(idx, a):
     y = idx%a
     return x, y
 
-def bringToSameLength(list1, list2):
-    """ Matches length of two lists. If one is shorter than the other, it will be extended with the contents of the other array """
-    #https://stackoverflow.com/questions/29972836/numpy-how-to-resize-an-random-array-using-another-array-as-template
-    if len(list1) < len(list2):
-        list1[len(list1):len(list2)]=list2[len(list1):]
-    elif len(list2) < len(list1):
-        list2[len(list2):len(list1)]=list1[len(list2):]
-    return list1, list2
+def evaluateControlUpdate(cmdString, torqueParser=None, posParser=None):
+    """ Evaluates pybulled control update (replaces eval statement for performance) """
+    # Return if command is empty
+    if cmdString == "": return
+    # Distinguish between position and force control
+    if "POSITION_CONTROL" in cmdString:
+        # Parse and perform position control
+        if posParser != None: res = posParser.parse(cmdString)
+        else: res = parse.parse("p.setJointMotorControl2({}, {}, controlMode=p.POSITION_CONTROL, force={}, targetPosition={})", cmdString)
+        # Unpack return value to required variables
+        robotID, jointID, force, targetPos = int(res[0]), int(res[1]), float(res[2]), float(res[3])
+        # Perform update
+        p.setJointMotorControl2(robotID, jointID, controlMode=p.POSITION_CONTROL, force=force, targetPosition=targetPos)
+    elif "TORQUE_CONTROL" in cmdString:
+        # Parse and perform torque control
+        if posParser != None: res = torqueParser.parse(cmdString)
+        else: res = parse.parse("p.setJointMotorControl2({}, {}, controlMode=p.TORQUE_CONTROL, force={})", cmdString)
+        # Unpack return value to required variables
+        robotID, jointID, force = int(res[0]), int(res[1]), float(res[2])
+        # Perform update
+        p.setJointMotorControl2(robotID, jointID, controlMode=p.TORQUE_CONTROL, force=force)
 
 class bulletInstance:
     """!@brief Manages workers and instantiates bullet simulation """
@@ -49,8 +96,12 @@ class bulletInstance:
         # Keep track of spawned robots and their id's
         self.activeModels = []
         #
-        # Keep track of which envs are ready for a sim step
-        self.readyEnvs = None
+        # Store compiled bullet commands for performance
+        self.posControlCmd = parse.compile("p.setJointMotorControl2({}, {}, controlMode=p.POSITION_CONTROL, force={}, targetPosition={})")
+        self.torqueControlCmd = parse.compile("p.setJointMotorControl2({}, {}, controlMode=p.TORQUE_CONTROL, force={})")
+        #
+        # Store feedback blueprint for performance
+        self.feedbackBlueprint = []
     #
     def __del__(self):
         """ Class Destructor """
@@ -97,34 +148,37 @@ class bulletInstance:
                     robotId, 
                     segmentId, 
                     linearDamping = simParams["JointLinearDamping"][j], 
-                    angularDamping = simParams["JointAngularDamping"][j]
+                    angularDamping = simParams["JointAngularDamping"][j],
+                    maxJointVelocity = simParams["JointMaxVelocity"][j]
                 )
         # When the loop is done, return joint info to be stored in rosparam
         return joints
     #
-    def update(self, readyArr):
+    def update(self, updateCommands, feedbackCommands):
         """ Checks which envs are ready for a sim step. If all are ready, a step is called """
-        # Update which envs were marked as ready in message
-        if self.readyEnvs != None:
-            readyArr, self.readyEnvs = bringToSameLength(readyArr, self.readyEnvs)
-            readyEnvs = [
-                a or b
-                for a, b in zip(readyArr, self.readyEnvs)
-            ]
-        else:
-            readyEnvs = readyArr
-        # Check if all envs are ready 
-        if all(readyEnvs):
-            # If they are, step simulation and reset the variable
-            p.stepSimulation()
-            self.readyEnvs = [ False for _ in readyEnvs ]
-            return 1
-        else:
-            # Otherwise, update class member
-            self.readyEnvs = readyEnvs
-            return 0
+        # Create feedback based on blueprint
+        if len(self.feedbackBlueprint) < len(feedbackCommands):
+            self.feedbackBlueprint = ["(0.0, 0.0, (0.0, 0.0, 0.0, 0.0, 0.0, 0.0), 0.0)" for _ in feedbackCommands]
+        #
+        feedback = copy.deepcopy(self.feedbackBlueprint[:len(feedbackCommands)])
+        #
+        # Iterate over joints and apply update commands
+        updateCommandsArr = np.array(updateCommands)
+        for cmd in updateCommandsArr[updateCommandsArr != None]:
+            print(cmd)
+            evaluateControlUpdate(cmd, torqueParser=self.torqueControlCmd, posParser=self.posControlCmd)
+        #
+        # Perform sim step
+        p.stepSimulation()
+        #
+        # Get active joint feedback
+        feedbackCommandsArr = np.array(feedbackCommands)
+        for i, cmd in enumerate( feedbackCommandsArr[feedbackCommandsArr != None] ):
+            feedback[i] = str(eval(cmd))
+        #
+        return feedback
 
-class ROSWrapper:
+class sharedMemWrapper:
     """!@brief Wraps physics simulation helper class to the ROS param and msg services """
     def __init__(self) -> None:
         # Load jointcontrol params from rospy
@@ -146,23 +200,56 @@ class ROSWrapper:
             rospy.set_param(
                 "/jointcontrol/J{}/SegmentID".format(idx), j[1]
             )
-        # Subscribe to synchronisation message and check in callback whether or not to perform a simulation step
-        rospy.init_node("BulletSimServer")
-        self.syncSub = rospy.Subscriber("jointcontrol/envSync", jointMetric, self.syncCallback)
-        # Register publisher to the synchronisation message
-        self.syncPub = rospy.Publisher("jointcontrol/globalEnvSync", jointMetric, queue_size = 1)
-        # Wait for everything to register
-        time.sleep(2)
+        #
+        # Command placeholders
+        self.registeredEnvs = [False for _ in range(self.NumJoints)]
+        self.updateCommands = [None for _ in range(self.NumJoints)]
+        self.feedbackCommands = [None for _ in range(self.NumJoints)]
+        # Shared mem servers
+        self.jointMetrics = [ sharedMemJointMetric(i, server=True) for i in range(self.NumJoints) ]
     #
-    def syncCallback(self, data):
-        """ Callback for synchronisation messages """
-        # Check return value of the simulation update
-        if self.sim.update(data.ready):
-            # If update was perfored, publish the synchronisation message in order to signal to the envs that the sim step is ready
-            self.syncPub.publish(
-                jointMetric( [ False for _ in data.ready ] )
-            )
-
+    def updateCall(self):
+        # Check which envs are registered and ready
+        readyArr = [ [entry.checkReady(), entry.checkRegistered()] for entry in self.jointMetrics ]
+        ready = np.array(readyArr)[:,0]
+        registered = np.array(readyArr)[:,1]
+        #
+        # Update everything, if all registered envs are ready
+        if np.all(ready == registered):
+            #
+            # Update registered envs
+            [ entry.loadState() for entry, reg in zip(self.jointMetrics, registered) if reg ]
+            #
+            for idx, (regnew, regold, ready) in enumerate(zip(registered, self.registeredEnvs, ready)):
+                if not ready:
+                    # If not ready, do nothing
+                    self.feedbackCommands[idx] = None
+                    continue
+                else:
+                    # Update registered envs
+                    self.jointMetrics.loadState()
+                    # If the env is newly registered, compile feedback command
+                    if regnew != regold:
+                        self.feedbackCommands[idx] = compile(self.jointMetrics[idx].feedbackCmd, "<string>", "eval")
+                    # update reference command
+                    self.updateCommands[idx] = self.jointMetrics[idx].updateCmd
+            #
+            # Update physics sim
+            jointFeedback  = self.sim.update(self.updateCommands, self.feedbackCommands)
+            # Reset update commands
+            self.updateCommands = copy.deepcopy(self.updateCommandBlueprint)
+            # Write joint feedback and flush to shared mem
+            for i, entry in enumerate(jointFeedback):
+                self.jointMetrics[i].jointFeedback = entry
+                self.jointMetrics[i].ready = False
+                self.jointMetrics[i].flushState()
+    
 if __name__ == "__main__":
-    wrap = ROSWrapper()
-    rospy.spin()
+    wrap = sharedMemWrapper()
+    time.sleep(1)
+    try:
+        while True:
+            wrap.updateCall()
+    except KeyboardInterrupt:
+        [ entry.unregister for entry in wrap.jointMetrics ]
+    
