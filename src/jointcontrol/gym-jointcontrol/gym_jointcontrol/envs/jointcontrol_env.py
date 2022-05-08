@@ -127,7 +127,7 @@ class jointcontrol_env(gym.Env):
 
         self.physicsCommand.setState(
             False,
-            False,
+            True,
             self.jointidx,
             "p.setJointMotorControl2({}, {}, controlMode=p.POSITION_CONTROL, force=0, targetPosition=0)".format(self.jointParams["RobotID"], self.jointParams["SegmentID"]),
             "p.getJointState({}, {})".format(self.jointParams["RobotID"], self.jointParams["SegmentID"]),

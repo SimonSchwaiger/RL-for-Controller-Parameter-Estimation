@@ -20,12 +20,14 @@ import torch as th
 
 # Instantiate gym environment and wrap it with the discrete action wrapper
 env = jointcontrolDiscrete(
-    gym.make('jointcontrol-v0', jointidx=1),
+    gym.make('jointcontrol-v0', jointidx=0),
     discretisation = 0.5
 )
 
 
-env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150000, "maxSteps":40 })
+env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 })
+
+
 
 
 def cEnv(idx):

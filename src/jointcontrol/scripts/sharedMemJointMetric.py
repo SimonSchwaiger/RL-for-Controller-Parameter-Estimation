@@ -47,7 +47,7 @@ class sharedMemJointMetric:
     #   
     def __del__(self):
         self.shm.close()
-        if self.sercer: self.shm.unlink()
+        if self.server: self.shm.unlink()
     #
     def unregister(self):
         self.shm.close()
@@ -82,7 +82,8 @@ class sharedMemJointMetric:
         #
         # Reset bytes that are not needed anymore
         if len(msg) < len(msgOld):
-            self.shm.buf[len(msg):len(msgOld)] = '\x00'
+            # The difference in length of the buffers is set to an array of encoded '\x00' bytes
+            self.shm.buf[len(msg):len(msgOld)] = ''.join([ '\x00' for _ in range(len(msgOld) - len(msg)) ]).encode()
         #
         # Write message to buffer
         self.shm.buf[1:len(msg)] = msg[1:]

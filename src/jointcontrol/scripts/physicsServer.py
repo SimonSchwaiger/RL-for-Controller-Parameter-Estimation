@@ -4,6 +4,7 @@
 
 # Pybullet components
 from asyncore import read
+from atexit import register
 from ntpath import join
 from turtle import update
 import pybullet as p
@@ -165,7 +166,6 @@ class bulletInstance:
         # Iterate over joints and apply update commands
         updateCommandsArr = np.array(updateCommands)
         for cmd in updateCommandsArr[updateCommandsArr != None]:
-            print(cmd)
             evaluateControlUpdate(cmd, torqueParser=self.torqueControlCmd, posParser=self.posControlCmd)
         #
         # Perform sim step
@@ -191,8 +191,14 @@ class sharedMemWrapper:
             realtime = params["SimParams"]["Realtime"],
             ts = params["SimParams"]["Ts"]
         )
-        # Create joints and store joint info in rosparam server
+        # Create joints and wait for them to be loaded in bullet
         joints = self.sim.createJoints(params["SimParams"])
+        time.sleep(3)
+        #
+        # Shared mem servers
+        self.jointMetrics = [ sharedMemJointMetric(i, server=True) for i in range(self.NumJoints) ]
+        #
+        # Write joint and sharedmem info into rosparam server
         for idx, j in enumerate(joints):
             rospy.set_param(
                 "/jointcontrol/J{}/RobotID".format(idx), j[0]
@@ -200,26 +206,24 @@ class sharedMemWrapper:
             rospy.set_param(
                 "/jointcontrol/J{}/SegmentID".format(idx), j[1]
             )
+            rospy.set_param(
+                "/jointcontrol/J{}/SharedMemID".format(idx), self.jointMetrics[idx].shm.name
+            )
         #
         # Command placeholders
         self.registeredEnvs = [False for _ in range(self.NumJoints)]
         self.updateCommands = [None for _ in range(self.NumJoints)]
+        self.updateCommandBlueprint = [None for _ in range(self.NumJoints)]
         self.feedbackCommands = [None for _ in range(self.NumJoints)]
-        # Shared mem servers
-        self.jointMetrics = [ sharedMemJointMetric(i, server=True) for i in range(self.NumJoints) ]
     #
     def updateCall(self):
         # Check which envs are registered and ready
-        readyArr = [ [entry.checkReady(), entry.checkRegistered()] for entry in self.jointMetrics ]
-        ready = np.array(readyArr)[:,0]
-        registered = np.array(readyArr)[:,1]
+        ready = [ entry.checkReady() for entry in self.jointMetrics ]
+        registered = [ entry.checkRegistered() for entry in self.jointMetrics ]
         #
         # Update everything, if all registered envs are ready
-        if np.all(ready == registered):
-            #
-            # Update registered envs
-            [ entry.loadState() for entry, reg in zip(self.jointMetrics, registered) if reg ]
-            #
+        if np.all(ready == registered) and np.any(registered):
+            # Iterate over all envs and work on ready ones
             for idx, (regnew, regold, ready) in enumerate(zip(registered, self.registeredEnvs, ready)):
                 if not ready:
                     # If not ready, do nothing
@@ -227,9 +231,9 @@ class sharedMemWrapper:
                     continue
                 else:
                     # Update registered envs
-                    self.jointMetrics.loadState()
+                    self.jointMetrics[idx].loadState()
                     # If the env is newly registered, compile feedback command
-                    if regnew != regold:
+                    if regnew != regold and regnew == True:
                         self.feedbackCommands[idx] = compile(self.jointMetrics[idx].feedbackCmd, "<string>", "eval")
                     # update reference command
                     self.updateCommands[idx] = self.jointMetrics[idx].updateCmd
@@ -238,6 +242,7 @@ class sharedMemWrapper:
             jointFeedback  = self.sim.update(self.updateCommands, self.feedbackCommands)
             # Reset update commands
             self.updateCommands = copy.deepcopy(self.updateCommandBlueprint)
+            self.registeredEnvs = copy.deepcopy(registered)
             # Write joint feedback and flush to shared mem
             for i, entry in enumerate(jointFeedback):
                 self.jointMetrics[i].jointFeedback = entry
@@ -250,6 +255,6 @@ if __name__ == "__main__":
     try:
         while True:
             wrap.updateCall()
+            #time.sleep(1)
     except KeyboardInterrupt:
         [ entry.unregister for entry in wrap.jointMetrics ]
-    
