@@ -77,13 +77,13 @@ class jointcontrol_env(gym.Env):
         # Define observation space as box with minimum and maximum controller params
         obsBoxMin = np.concatenate(
             (
-                np.array([-10 for _ in range(5)], dtype=np.float32),
+                np.array([-10 for _ in range(15)], dtype=np.float32),
                 np.array(self.jointParams["Minimums"], dtype=np.float32)
             )
         )
         obsBoxMax = np.concatenate(
             (
-                np.array([10 for _ in range(5)], dtype=np.float32),
+                np.array([10 for _ in range(15)], dtype=np.float32),
                 np.array(self.jointParams["Maximums"], dtype=np.float32)
             )
         )
@@ -189,7 +189,7 @@ class jointcontrol_env(gym.Env):
         feedback = self.getJointState()     # Variable to track bullet joint feedback
 
         # Track step performance
-        debugPerformance = True
+        debugPerformance = False
         tracker = performanceTimer()
 
         # Iterate over controlsignal

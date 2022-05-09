@@ -14,18 +14,90 @@ import gym
 import gym_jointcontrol
 from discreteActionWrapper import *
 
-# Import PPO2 implementation
+# Import agent implementations
 from stable_baselines3 import PPO, DQN, DDPG
 import torch as th
+from stable_baselines3.common.logger import configure
 
-# Instantiate gym environment and wrap it with the discrete action wrapper
-env = jointcontrolDiscrete(
-    gym.make('jointcontrol-v0', jointidx=0),
-    discretisation = 0.5
+# Start tensorboard to allow for visualisation of training process
+os.system("tensorboard --logdir /training_tensorboard/ --host 0.0.0.0 --port 6006 &")
+
+
+"""
+THE PLAN:
+
+write masterscript that keeps track of training processes
+
+create dir for current experiment logs
+
+-> start tensorboard
+
+-> open subprocesses for each training run
+
+TODO: how to check if training is done.. jobsystem?
+
+"""
+
+
+jointidx = 0
+discretisation = 0
+logPath = "/tmp/sb3_log/"
+
+# PPO & DDPG type policy args
+policy_kwargs = dict(
+    activation_fn = th.nn.Tanh,
+    net_arch=[ dict(pi=[ 32,32 ], vf=[ 32,32 ]) ]
 )
 
+# DQN type policy args
+policy_kwargs = dict(
+    activation_fn = th.nn.Tanh,
+    net_arch=[ 32, 32, 32 ]
+)
+
+modelClass = DQN
+
+trainingTimesteps = 10000
+
+## Instantiate gym environment and wrap it with the discrete action wrapper
+env = jointcontrolDiscrete(
+    gym.make('jointcontrol-v0', jointidx=jointidx),
+    discretisation=discretisation
+)
 
 env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 })
+
+
+
+## Instantiate model and overwrite default logger
+new_logger = configure(logPath, ["stdout", "csv", "tensorboard"])
+
+model = modelClass("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1)
+model.set_logger(new_logger)
+
+
+model.learn(total_timesteps=trainingTimesteps)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+model = DQN("MlpPolicy", env, tensorboard_log="/training_tensorboard/", verbose=1)
+
+
+
 
 
 
