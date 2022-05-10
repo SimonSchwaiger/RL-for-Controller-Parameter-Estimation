@@ -1,6 +1,8 @@
 
-from multiprocessing import shared_memory
+from multiprocessing import shared_memory, resource_tracker
+
 import re
+import time
 
 class sharedMemJointMetric:
     """ 
@@ -31,8 +33,6 @@ class sharedMemJointMetric:
         # Compiled regex for cleaning up received messages
         self.regex = re.compile('\x00')
         #
-        # Track if we are the server
-        self.server = server
         # If we are the server, format empty state, to track active envs
         if server == True: 
             self.setState(
@@ -44,14 +44,36 @@ class sharedMemJointMetric:
                 " "
             )
             self.flushState()
+        #
+        # Track if we are the server
+        self.server = server
     #   
     def __del__(self):
-        self.shm.close()
-        if self.server: self.shm.unlink()
+        pass
+        #self.shm.close()
+        #if self.server == True: self.shm.unlink()
     #
     def unregister(self):
+        # If we are the client environment, then set current status to inactive
+        if self.server == False:
+            for i in range(3):
+                self.setState(
+                    False,
+                    False,
+                    self.jointID,
+                    " ",
+                    " ",
+                    " "
+                )
+                time.sleep(0.1)
+            self.flushState()
+        # Close connection to shared memory and destroy it, if server
+        # Unregister from resource tracker in case we are not the server to prevent accidental cleanup
+        # https://bugs.python.org/issue39959#msg368770
+        # https://stackoverflow.com/questions/64102502/shared-memory-deleted-at-exit
+        if self.server == False: resource_tracker.unregister(self.shm._name, 'shared_memory')
         self.shm.close()
-        if self.server: self.shm.unlink()
+        if self.server == True: self.shm.unlink()
     #
     def setState(self, ready, registered, jointID, updateCmd, feedbackCmd, jointFeedback):
         self.ready = ready

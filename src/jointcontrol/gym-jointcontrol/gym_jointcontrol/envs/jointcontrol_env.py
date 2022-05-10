@@ -19,6 +19,33 @@ sys.path.append("/catkin_ws/src/jointcontrol/scripts")
 from controllers import *
 from sharedMemJointMetric import *
 
+from multiprocessing import resource_tracker
+
+
+def remove_shm_from_resource_tracker():
+    """Monkey-patch multiprocessing.resource_tracker so SharedMemory won't be tracked
+
+    More details at: https://bugs.python.org/issue38119
+
+    https://bugs.python.org/issue38119#msg388287
+    """
+    #
+    def fix_register(name, rtype):
+        if rtype == "shared_memory":
+            return
+        return resource_tracker._resource_tracker.register(self, name, rtype)
+    resource_tracker.register = fix_register
+    #
+    def fix_unregister(name, rtype):
+        if rtype == "shared_memory":
+            return
+        return resource_tracker._resource_tracker.unregister(self, name, rtype)
+    resource_tracker.unregister = fix_unregister
+    #
+    if "shared_memory" in resource_tracker._CLEANUP_FUNCS:
+        del resource_tracker._CLEANUP_FUNCS["shared_memory"]
+
+
 class performanceTimer:
     """ Tracks exection time of code segments """
     def __init__(self) -> None:
@@ -103,6 +130,11 @@ class jointcontrol_env(gym.Env):
         self.latestControllerOutput = None      # Stores the controller output [Nm] from the latest sim step
         self.ts = params["SimParams"]["Ts"]     # Stores time discretisation in order to properly visualise trajectories
 
+        # Store episode trajectory configuration
+        self.episodeType = None
+        self.episodeConfig = None
+        self.setTrajectoryConfig()
+
         # Init ROS node
         #try:
         #    rospy.init_node("j{}GymEnv".format(self.jointidx))
@@ -138,7 +170,8 @@ class jointcontrol_env(gym.Env):
 
     def __del__(self):
         """ Class Deconstructor """
-        self.physicsCommand.unregister()
+        pass
+        #self.physicsCommand.unregister()
         # Unregister env at physics server
         # cmd = jointMetric()
         # cmd.ready = False
@@ -247,7 +280,7 @@ class jointcontrol_env(gym.Env):
         # Return
         return self.formatObs(), reward, done, {}
 
-    def reset(self, episodeType='step', config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 }):
+    def reset(self, episodeType=None, config=None):
         """
         Resets environment and returns env observation 
 
@@ -282,6 +315,11 @@ class jointcontrol_env(gym.Env):
         Switching between types of control signals is implemented using a dict and each episodeType is implemented as its own method.
         In order to use any response other than 'step', the reset method must be called as env.env.reset(episodeType=.., config=..) instead of env.reset() due to how Gym's inheritance is implemented.
         """
+        # If no epsidoeType and config are provided, use the ones stored as class members
+        if episodeType == None and config == None:
+            episodeType = self.episodeType
+            config = self.episodeConfig
+
         def step(self, config):
             """ Creates and configures step response """
             # Create step response as a simple list and set number of performed tests per episode
@@ -338,6 +376,12 @@ class jointcontrol_env(gym.Env):
 
         return self.formatObs()
 
+    def closeSharedMem(self):
+        # Remove shared memory from resource tracker in order to prevent unlinking of the block
+        remove_shm_from_resource_tracker()
+        # Unregister client
+        self.physicsCommand.unregister()
+
     def render(self, mode="human"):
         # No need to render, as it happens in ROS
         pass
@@ -358,6 +402,12 @@ class jointcontrol_env(gym.Env):
 
     # Environment-specific methods
     # ----------------------------
+
+    def setTrajectoryConfig(self, episodeType='step', config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 }):
+        """ Permanently stores trajectory type and configuration for each episode """
+        self.episodeType = episodeType
+        self.episodeConfig = config
+
     def formatObs(self):
         """ Formats observation """
         def getSignalFeatures(arr):

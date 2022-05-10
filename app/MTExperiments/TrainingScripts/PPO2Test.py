@@ -31,8 +31,13 @@ write masterscript that keeps track of training processes
 create dir for current experiment logs
 
 -> start tensorboard
+https://stable-baselines3.readthedocs.io/en/master/common/logger.html
 
 -> open subprocesses for each training run
+https://stackoverflow.com/questions/546017/how-do-i-run-another-script-in-python-without-waiting-for-it-to-finish
+
+Then get all logs into pandas and do visualisations from there
+https://tryolabs.com/blog/2017/03/16/pandas-seaborn-a-guide-to-handle-visualize-data-elegantly
 
 TODO: how to check if training is done.. jobsystem?
 
@@ -72,11 +77,11 @@ env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSt
 ## Instantiate model and overwrite default logger
 new_logger = configure(logPath, ["stdout", "csv", "tensorboard"])
 
-model = modelClass("MlpPolicy", env, policy_kwargs=policy_kwargs, verbose=1)
+
 model.set_logger(new_logger)
 
 
-model.learn(total_timesteps=trainingTimesteps)
+model.learn(total_timesteps=trainingTimesteps, tb_log_name="first_run")
 
 
 

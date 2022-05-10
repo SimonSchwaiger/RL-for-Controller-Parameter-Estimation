@@ -215,6 +215,7 @@ class sharedMemWrapper:
         self.updateCommands = [None for _ in range(self.NumJoints)]
         self.updateCommandBlueprint = [None for _ in range(self.NumJoints)]
         self.feedbackCommands = [None for _ in range(self.NumJoints)]
+        self.emptyUpdateCount = 0
     #
     def updateCall(self):
         # Check which envs are registered and ready
@@ -222,12 +223,25 @@ class sharedMemWrapper:
         registered = [ entry.checkRegistered() for entry in self.jointMetrics ]
         #
         # Update everything, if all registered envs are ready
-        if np.all(ready == registered) and np.any(registered):
+        # If no env is ready, three update cycles are performed in order to allow the server to recover cleaned shared mem instances
+        if (np.all(ready == registered) and np.any(registered)) or (not np.any(registered) and self.emptyUpdateCount < 3):
+            if np.any(registered): self.emptyUpdateCount = 0
+            else: self.emptyUpdateCount += 1
             # Iterate over all envs and work on ready ones
             for idx, (regnew, regold, ready) in enumerate(zip(registered, self.registeredEnvs, ready)):
                 if not ready:
+                    # If the env has recently been unregistered, reset the server instance
+                    if regnew != regold and regnew == False:
+                        #try:
+                        #    self.jointMetrics[idx].unregister()
+                        #except FileNotFoundError:
+                        #    pass
+                        #self.jointMetrics[idx] = None
+                        #self.jointMetrics[idx] = sharedMemJointMetric(idx, server=True)
+                        pass
                     # If not ready, do nothing
                     self.feedbackCommands[idx] = None
+                    self.jointMetrics[idx].registered = False
                     continue
                 else:
                     # Update registered envs
@@ -248,7 +262,7 @@ class sharedMemWrapper:
                 self.jointMetrics[i].jointFeedback = entry
                 self.jointMetrics[i].ready = False
                 self.jointMetrics[i].flushState()
-    
+
 if __name__ == "__main__":
     wrap = sharedMemWrapper()
     time.sleep(1)
