@@ -172,9 +172,9 @@ class bulletInstance:
         p.stepSimulation()
         #
         # Get active joint feedback
-        feedbackCommandsArr = np.array(feedbackCommands)
-        for i, cmd in enumerate( feedbackCommandsArr[feedbackCommandsArr != None] ):
-            feedback[i] = str(eval(cmd))
+        #feedbackCommandsArr = np.array(feedbackCommands)
+        for i, cmd in enumerate( feedbackCommands ):
+            if cmd != None: feedback[i] = str(eval(cmd))
         #
         return feedback
 
@@ -231,17 +231,11 @@ class sharedMemWrapper:
             for idx, (regnew, regold, ready) in enumerate(zip(registered, self.registeredEnvs, ready)):
                 if not ready:
                     # If the env has recently been unregistered, reset the server instance
-                    if regnew != regold and regnew == False:
-                        #try:
-                        #    self.jointMetrics[idx].unregister()
-                        #except FileNotFoundError:
-                        #    pass
-                        #self.jointMetrics[idx] = None
-                        #self.jointMetrics[idx] = sharedMemJointMetric(idx, server=True)
-                        pass
-                    # If not ready, do nothing
                     self.feedbackCommands[idx] = None
                     self.jointMetrics[idx].registered = False
+                    # If the env has just ben unregistered, flush freshly reset state
+                    #if regnew != regold and regnew == False:
+                        #self.jointMetrics[idx].flushState()
                     continue
                 else:
                     # Update registered envs

@@ -209,6 +209,9 @@ class jointcontrol_env(gym.Env):
             out = self.currentParams
         )
 
+        # Deactivate torque control
+        #self.torqueControlUpdate(0)
+        #self.waitForPhysicsUpdate()
         # Set joint to initial position
         while abs( self.getJointState()[0] - self.controlSignal[0]) > 0.05:
             self.positionControlUpdate(cmdForce=100, cmdPos=self.controlSignal[0])
@@ -380,6 +383,11 @@ class jointcontrol_env(gym.Env):
         return self.formatObs()
 
     def closeSharedMem(self):
+        # Remove control over joint
+        #self.positionControlUpdate()
+        #self.waitForPhysicsUpdate()
+        #self.torqueControlUpdate()
+        #self.waitForPhysicsUpdate()
         # Remove shared memory from resource tracker in order to prevent resource tracker warnings due shared mem outliving the environment
         # https://bugs.python.org/issue38119#msg388287
         remove_shm_from_resource_tracker()

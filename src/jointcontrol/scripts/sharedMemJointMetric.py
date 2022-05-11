@@ -56,7 +56,7 @@ class sharedMemJointMetric:
     def unregister(self):
         # If we are the client environment, then set current status to inactive
         if self.server == False:
-            for i in range(3):
+            for i in range(2):
                 self.setState(
                     False,
                     False,
@@ -65,8 +65,8 @@ class sharedMemJointMetric:
                     " ",
                     " "
                 )
-                time.sleep(0.1)
-            self.flushState()
+                self.flushState()
+                #time.sleep(0.1)
         # Close connection to shared memory and destroy it, if server
         # Unregister from resource tracker in case we are not the server to prevent accidental cleanup
         # https://bugs.python.org/issue39959#msg368770
