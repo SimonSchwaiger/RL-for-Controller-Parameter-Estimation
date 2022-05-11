@@ -7,15 +7,13 @@ source /catkin_ws/devel/setup.bash
 
 python
 
-
-
 import subprocess
 import os
 import sys
+import time
 sys.path.append("/catkin_ws/src/jointcontrol/scripts")
 
 import numpy as np
-from stable_baselines3.common import utils
 
 """ 
 Control script for experiment 4 
@@ -43,65 +41,147 @@ config = {
     "resetConfig": str({ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 }),
     "trajectoryType": "step"
 }
-
-
-# PPO & DDPG type policy args
-policy_kwargs = dict(
-    activation_fn = th.nn.Tanh,
-    net_arch=[ dict(pi=[ 32,32 ], vf=[ 32,32 ]) ]
-)
-
-# DQN type policy args
-policy_kwargs = dict(
-    activation_fn = th.nn.Tanh,
-    net_arch=[ 32, 32, 32 ]
-)
-
 """
+
+runTraining = True      # Determines, whether or not training is conducted or only visualisation is performed
+trainingSteps = 15000   # Determines performed training steps
 
 # Start tensorboard to allow for visualisation of training process
 logdir = "/app/MTExperiments/Data/4StepResponseTrainingDefaultParams"
-os.system("tensorboard --logdir {} --host 0.0.0.0 --port 6006 &".format(logdir))
+os.system("tensorboard --logdir {}/tensorboard --host 0.0.0.0 --port 6006 &".format(logdir))
 
+# Point to RL agent deployment script
 agentPath = "/app/MTExperiments/TrainingScripts/RLAgent.py"
 
-# Test DQN
-config = {
+
+#############################################################################
+## DQN Discrete
+
+DQNConfig = {
     "jointID": 0,
     "logdir": logdir,
     "modelclass": "DQN",
     "modelrun": 0,
     "modelname": "DQN",
     "learningRate": None, 
-    "trainingTimesteps": 10,
+    "trainingTimesteps": trainingSteps,
     "policyNetwork": None,
     "optimizer": None,
     "discretisation": 0.1,
-    "resetConfig": { "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 },
+    "resetConfig": { "initialPos":-1.57, "stepPos":0, "samplesPerStep":150, "maxSteps":40 },
     "trajectoryType": "step"
 }
 
 
-# Start process in the background
-p = subprocess.Popen([sys.executable, agentPath, str(config)])
+#############################################################################
+## DDPG Continuous
+
+DDPGConfig = {
+    "jointID": 0,
+    "logdir": logdir,
+    "modelclass": "DDPG",
+    "modelrun": 0,
+    "modelname": "DDPG",
+    "learningRate": None, 
+    "trainingTimesteps": trainingSteps,
+    "policyNetwork": None,
+    "optimizer": None,
+    "discretisation": None,
+    "resetConfig": { "initialPos":-1.57, "stepPos":0, "samplesPerStep":150, "maxSteps":40 },
+    "trajectoryType": "step"
+}
+
+#############################################################################
+## PPO Discrete
+
+PPODiscreteConfig = {
+    "jointID": 0,
+    "logdir": logdir,
+    "modelclass": "PPO",
+    "modelrun": 0,
+    "modelname": "PPO_Discrete",
+    "learningRate": None, 
+    "trainingTimesteps": trainingSteps,
+    "policyNetwork": None,
+    "optimizer": None,
+    "discretisation": 0.1,
+    "resetConfig": { "initialPos":-1.57, "stepPos":0, "samplesPerStep":150, "maxSteps":40 },
+    "trajectoryType": "step"
+}
+
+#############################################################################
+## PPO Continuous
+
+PPOContinuousConfig = {
+    "jointID": 0,
+    "logdir": logdir,
+    "modelclass": "PPO",
+    "modelrun": 0,
+    "modelname": "PPOContinuous",
+    "learningRate": None, 
+    "trainingTimesteps": trainingSteps,
+    "policyNetwork": None,
+    "optimizer": None,
+    "discretisation": None,
+    "resetConfig": { "initialPos":-1.57, "stepPos":0, "samplesPerStep":150, "maxSteps":40 },
+    "trajectoryType": "step"
+}
 
 
-#TODO fix environment deletion resetting shared memory
+# Debug: for one environment
+#p = subprocess.Popen([sys.executable, agentPath, str(PPOContinuousConfig)])
+#streamdata = p.communicate()[0]
+#print(p.returncode)
+
+#############################################################################
+## RUN Training Episodes for each Algorithm
+
+def runAgentTests(config, testRuns=5):
+    """ Performs testRuns """
+    processes = [None for _ in range(testRuns)]
+    #
+    for i in range(testRuns):
+        # Start process in the background
+        config["jointID"] = i
+        config["modelrun"] = i
+        processes[i] = subprocess.Popen([sys.executable, agentPath, str(config)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        # Wait for env to register
+        time.sleep(1)
+    #
+    # Wait for processes to finish and record return codes
+    rc = []
+    for i in range(testRuns):
+        streamdata = processes[i].communicate()[0]
+        rc.append(processes[i].returncode)
+    #
+    print("{} agent tests successfully exited with return codes {}".format(config["modelname"], rc))
+
+# Perform testruns of all configurations
+if runTraining:
+    runAgentTests(DQNConfig)
+    runAgentTests(DDPGConfig)
+    runAgentTests(PPODiscreteConfig)
+    runAgentTests(PPOContinuousConfig)
+
+
+
+
+
+
+#############################################################################
+## VISUALISE training results
+
+# Load numpy results
+def loadTestepisodeResults(config, testRuns=5):
+    """ Loads evaluation episode results based on configuration """
+    ret = []
+    for run in range(testRuns):
+        filename = "{}/testepisodes_{}_{}.npy".format(config["logdir"], config["modelname"], run)
+        ret.append(np.load(filename), allow_pickle=True).item()
+    #
+    return ret
+
+
 # 
-# https://bugs.python.org/issue38119#msg388287
-# https://stackoverflow.com/questions/62748654/python-3-8-shared-memory-resource-tracker-producing-unexpected-warnings-at-appli
-
-
-
-
-
-# Set random seed
-utils.set_random_seed(np.random.randint(0, 2**32-1))
-
-
-streamdata = p.communicate()[0]
-rc = p.returncode
-
-print("successfully done {}".format(rc))
-
+#testepisodeResults = np.load('/app/MTExperiments/Data/4StepResponseTrainingDefaultParams/testepisodes_DQN_0.npy', allow_pickle=True).item()
 

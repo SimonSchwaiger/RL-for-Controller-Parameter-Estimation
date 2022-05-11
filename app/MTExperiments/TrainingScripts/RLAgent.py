@@ -21,11 +21,15 @@ import torch as th
 
 from multiprocessing import resource_tracker
 
-""" DQN agent and instantiation script """
+
+""" RL agent and environment instantiation script """
 
 # Load configuration from script args
 assert len(sys.argv) > 1
 config = eval(sys.argv[1])
+
+# Set random seed
+utils.set_random_seed(np.random.randint(0, 2**32-1))
 
 
 ## Instantiate gym environment
@@ -69,9 +73,8 @@ else:
     model = modelclass("MlpPolicy", env, tensorboard_log="{}/tensorboard".format(config["logdir"]), verbose=1)
 
 
-# Configure logging for stdout, csv (as a backup) and tensorboard
-#new_logger = configure(config["logdir"], ["stdout", "csv", "tensorboard"])
-#model.set_logger(new_logger)
+# If the modelclass is DQN, reduce the warmup phase from 50000 to 5000 steps
+if modelclass == DQN: model.learning_starts = 5000
 
 # Configure optimiser parameters if desired
 if config["learningRate"] != None:
@@ -83,8 +86,19 @@ if config["learningRate"] != None:
 ## Start training
 model.learn(total_timesteps=config["trainingTimesteps"], tb_log_name="{}_{}".format(config["modelname"], config["modelrun"]))
 
+
 ## Perform Evaluation Episodes and store log
-mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10)
+evalEpisodeRewards = []
+evalEpisodeObservations = []
+
+# The custom callback trakcs evaluation episode rewards and observations for controller parameter testing later
+def evaluationCallback(localArgs, globalArgs):
+    """ Custom callback to track controller parameters during test episodes """
+    evalEpisodeRewards.append(localArgs["rewards"][0])
+    evalEpisodeObservations.append(localArgs["observations"][0])
+
+
+mean_reward, std_reward = evaluate_policy(model, model.get_env(), n_eval_episodes=10, callback=evaluationCallback)
 
 # Save evaluation episodes
 with open("{}/testepisodes_{}_{}.npy".format(
@@ -96,6 +110,8 @@ with open("{}/testepisodes_{}_{}.npy".format(
         {
             "model": config["modelname"],
             "run": config["modelrun"],
+            "evalEpisodeRewards": evalEpisodeRewards,
+            "evalEpisodeObservations": evalEpisodeObservations,
             "mean_reward": mean_reward,
             "std_reward": std_reward
         }
@@ -105,7 +121,7 @@ with open("{}/testepisodes_{}_{}.npy".format(
 # Unregister from resource tracker in case we are not the server to prevent accidental cleanup
 # https://bugs.python.org/issue39959#msg368770
 # https://stackoverflow.com/questions/64102502/shared-memory-deleted-at-exit
-if config["discretisation"] != None:
+if config["discretisation"] == None:
     resource_tracker.unregister(env.env.physicsCommand.shm._name, 'shared_memory')
     env.env.closeSharedMem()
 else:

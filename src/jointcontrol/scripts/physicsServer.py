@@ -259,9 +259,10 @@ class sharedMemWrapper:
             self.registeredEnvs = copy.deepcopy(registered)
             # Write joint feedback and flush to shared mem
             for i, entry in enumerate(jointFeedback):
-                self.jointMetrics[i].jointFeedback = entry
-                self.jointMetrics[i].ready = False
-                self.jointMetrics[i].flushState()
+                if registered[i]:
+                    self.jointMetrics[i].jointFeedback = entry
+                    self.jointMetrics[i].ready = False
+                    self.jointMetrics[i].flushState()
 
 if __name__ == "__main__":
     wrap = sharedMemWrapper()

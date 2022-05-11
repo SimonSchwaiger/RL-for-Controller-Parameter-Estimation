@@ -191,10 +191,13 @@ class jointcontrol_env(gym.Env):
 
         # If action is not within action space, terminate the episode and return
         if False in [ -1 <= a <= 1 for a in action ]:
-            return self.formatObs(), -10, True, {} 
+            return self.formatObs(), -100, True, {} 
 
         action = self.actionToParams(action)
 
+        # Limit action to a precision of 3 decimal points
+        action = np.round( np.array(action) , decimals=3)
+        
         # Calculate current controller params after action
         self.currentParams += np.array(action)
 
@@ -377,7 +380,8 @@ class jointcontrol_env(gym.Env):
         return self.formatObs()
 
     def closeSharedMem(self):
-        # Remove shared memory from resource tracker in order to prevent unlinking of the block
+        # Remove shared memory from resource tracker in order to prevent resource tracker warnings due shared mem outliving the environment
+        # https://bugs.python.org/issue38119#msg388287
         remove_shm_from_resource_tracker()
         # Unregister client
         self.physicsCommand.unregister()
