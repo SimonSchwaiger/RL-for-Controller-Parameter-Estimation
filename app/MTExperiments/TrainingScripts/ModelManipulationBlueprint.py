@@ -16,7 +16,7 @@ from stable_baselines3.common.evaluation import evaluate_policy
 
 
 ## Instantiate env and model
-model_class = PPO
+model_class = DDPG
 
 if model_class == DQN:
     env = jointcontrolDiscrete(
@@ -30,7 +30,12 @@ else:
 
 env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 })
 
+
+optimParams = {"param_groups": [{"lr":0.01}]}
+
 model = model_class("MlpPolicy", env, tensorboard_log="/training_tensorboard/", verbose=1)
+
+
 
 
 # Close env

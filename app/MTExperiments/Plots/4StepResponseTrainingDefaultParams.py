@@ -351,7 +351,7 @@ plt.suptitle("Mean Return during Agent Training", fontsize=16)
 plt.xlabel('Training Steps')
 plt.ylabel('Mean Return')
 #plt.xlim([-12500, 1000])
-plt.ylim([-80, -20])
+plt.ylim([-80, -10])
 plt.grid()
 plt.legend()
 
@@ -379,6 +379,19 @@ import matplotlib
 
 matplotlib.style.use("default")
 
+## Set matplotlib figure size as seen here
+# https://stackoverflow.com/questions/44970010/axes-class-set-explicitly-size-width-height-of-axes-in-given-units
+def set_size(w,h, ax=None):
+    """ w, h: width, height in inches """
+    if not ax: ax=plt.gca()
+    l = ax.figure.subplotpars.left
+    r = ax.figure.subplotpars.right
+    t = ax.figure.subplotpars.top
+    b = ax.figure.subplotpars.bottom
+    figw = float(w)/(r-l)
+    figh = float(h)/(t-b)
+    ax.figure.set_size_inches(figw, figh)
+
 ## Import thesis colours
 sys.path.append("/app/MTExperiments/Plots")
 from colourmaps import *
@@ -392,7 +405,8 @@ def loadTestepisodeResults(config, testRuns=5):
     #
     return ret
 
-# Iterate over config files and load eval episode and tensorboard results
+
+## Iterate over config files and load eval episode and tensorboard results
 episodeLength = 40
 evalEpisodeResults = []
 
@@ -408,87 +422,75 @@ for config in [DQNConfig, DDPGConfig, PPODiscreteConfig, PPOContinuousConfig, Ra
     evalEpisodeResults.append(rawEvalRewards[0]["evalEpisodeRewards"])
 
 
+## Determine default controller parameter performance for the test
+sys.path.append("/catkin_ws/src/jointcontrol/scripts")
+import gym
+from discreteActionWrapper import *
+from multiprocessing import resource_tracker
 
-#TODO: 2 plots side by side, one with random agent for reference
-# + default parameter control offset as line
+# Make environment
+env = gym.make('jointcontrol-v0', jointidx=6)
+env.reset(episodeType="step", config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 })
+_, referenceReward, _, _ = env.step(None)
+resource_tracker.unregister(env.env.physicsCommand.shm._name, 'shared_memory')
+env.env.closeSharedMem()
 
-labels = ["DQN", "DDPG", "PPO Discrete", "PPO Continuous", "Random Agent"]
+## Set up plot (2 Plots side-by-side) both plotting per step reward with default parameter performance as a reference
+# One plot also includes the random agent
 
-box = plt.boxplot(
-    evalEpisodeResults[:4],
-    labels=labels[:4],
-    notch=False,
-    showfliers=False, 
-    patch_artist=True
+labels = ["DQN", "DDPG", "PPO(D)", "PPO(C)", "Random"]
+
+linecolour = colourScheme1["darkblue"]
+meadianlinecolour = colourScheme1["twblue"]
+fillcolour = colourScheme1["lightblue"]
+referenceColour = colourScheme2["yellow"]
+
+boxwidth = 0.3
+
+plt.rcParams.update({'font.size': 12})
+fig, (ax0, ax1) = plt.subplots(1,2, sharey=False)
+
+box0 = ax0.boxplot(
+    evalEpisodeResults, labels=labels, notch=False, showfliers=True, patch_artist=True, widths=boxwidth,
+    boxprops=dict(facecolor=fillcolour, color=linecolour),
+    capprops=dict(color=linecolour),
+    whiskerprops=dict(color=linecolour),
+    flierprops=dict(color=fillcolour, markeredgecolor=linecolour),
+    medianprops=dict(color=meadianlinecolour),
 )
 
-plt.show()
+box1 = ax1.boxplot(
+    evalEpisodeResults[:4], labels=labels[:4], notch=False, showfliers=False, patch_artist=True, widths=boxwidth*0.8,
+    boxprops=dict(facecolor=fillcolour, color=linecolour),
+    capprops=dict(color=linecolour),
+    whiskerprops=dict(color=linecolour),
+    flierprops=dict(color=fillcolour, markeredgecolor=linecolour),
+    medianprops=dict(color=meadianlinecolour),
+)
 
-# 
-#testepisodeResults = np.load('/app/MTExperiments/Data/4StepResponseTrainingDefaultParams/testepisodes_DQN_0.npy', allow_pickle=True).item()
+# Add reference control error
+ax0.axhline(y=referenceReward, xmin=0.05, xmax=0.95, linestyle="--", color=referenceColour, label="Default Controller Parameters")
+ax1.axhline(y=referenceReward, xmin=0.05, xmax=0.95, linestyle="--", color=referenceColour, label="Default Controller Parameters")
 
+# Format axes, set size and plot
+ax0.grid()
+ax1.grid()
 
+ax0.legend()
 
+ax0.set_ylabel("Negative Mean Squared Control Error")
 
+ax0.set_title("With Random Agent") 
+ax1.set_title("Without Random Agent")
 
+fig.suptitle("Controller Evaluation Episode Results", fontsize=16)
 
-###     Testing Episodes Plot    ###
-from matplotlib import rcParams
-rcParams['font.family'] = 'serif'
-rcParams['font.size'] = 16
-#rcParams['font.sans-serif'] = ['Tahoma']
-import matplotlib.pyplot as plt
+set_size(7,3.6)
+plt.tight_layout()
 
-vanilla_evaluation_rewards = np.loadtxt('vanilla_evaluation_rewards.txt', dtype=float)
-her_evaluation_rewards = np.loadtxt('her_evaluation_rewards.txt', dtype=float)
-reward_shaped_evaluation_rewards = np.loadtxt('reward_shaped_evaluation_rewards.txt', dtype=float)
+plt.subplots_adjust(top = 0.862)
 
-
-
-
-
-
-
-fig, ax = plt.subplots(3, constrained_layout=True, sharex=True)
-
-labels = ['DQN', 'DQN+HER', 'DQN+Reward Shaping']
-pos = np.arange(1,11)
-
-box1 = ax[0].boxplot(vanilla_evaluation_rewards, positions = pos, widths=0.25, notch=False, showfliers=False, patch_artist=True)
-box2 = ax[1].boxplot(her_evaluation_rewards, positions = pos, widths=0.25, notch=False, showfliers=False, patch_artist=True)
-box3 = ax[2].boxplot(reward_shaped_evaluation_rewards, positions = pos, widths=0.25, notch=False, showfliers=False, patch_artist=True)
-
-
-boxes = [box1, box2, box3]
-colors = ['blue', 'darkcyan', 'tomato']
-
-for box, c in zip(boxes, colors):
-    #for item in ['boxes']:
-     #       plt.setp(box[item], color=c)
-    plt.setp(box["boxes"], facecolor=c)
-    plt.setp(box['medians'], color='black')
-    #plt.setp(box["fliers"], markeredgecolor=c)
-
-for a in ax:
-    a.set_ylim(-1, 2)
-    a.set_xlim(0.5,10.5)
-    a.set_yticks(np.arange(-1, 3, 1))
-    a.set_xticks(pos)
-    a.grid()
-    a.set_ylabel('Average Return', fontsize=18)
-
-#plt.figtext(0, 0.95, labels[0], color='white', backgroundcolor=colors[0])
-#plt.figtext(0, 0.9, labels[1], color='white', backgroundcolor=colors[1])
-#plt.figtext(0, 0.85, labels[2], color='white', backgroundcolor=colors[2])
-
-ax[0].set_title(labels[0], fontsize=20)
-ax[1].set_title(labels[1], fontsize=20)
-ax[2].set_title(labels[2], fontsize=20)
-
-ax[2].set_xlabel('Test Batch Episode', fontsize=18)
-
-plt.sca(ax[2])
-plt.xticks(pos, pos*100)
+plt.savefig("/app/resultsStepResponseDefaultParamsControlErrorBox.pdf", bbox_inches='tight')
 plt.show()
 
 

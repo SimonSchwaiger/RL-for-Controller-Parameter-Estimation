@@ -20,7 +20,7 @@ from colourmaps import *
 
 # Make environment
 env = gym.make('jointcontrol-v0', jointidx=0)
-env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":200, "maxSteps":40 })
+env.reset(episodeType="step", config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":200, "maxSteps":40 })
 
 ## Perform step responses to empirically determine amplification at each frequency
 # Set up frequencies that will be tested

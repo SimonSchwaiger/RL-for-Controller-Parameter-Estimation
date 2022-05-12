@@ -62,7 +62,7 @@ step1RealRobotPosition = pos[start:end]
 ## Simulate step 1 and track feedback
 # Set up env, perform step and store response
 env = gym.make('jointcontrol-v0', jointidx=0)
-env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":200, "maxSteps":40 })
+env.reset(episodeType="step", config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":200, "maxSteps":40 })
 
 start = detectStep(env.env.controlSignal)
 end = int(stepDuration/0.01)+start

@@ -72,16 +72,22 @@ else:
     # Otherwise, initialise the default model
     model = modelclass("MlpPolicy", env, tensorboard_log="{}/tensorboard".format(config["logdir"]), verbose=1)
 
-
 # If the modelclass is DQN, reduce the warmup phase from 50000 to 5000 steps
 if modelclass == DQN: model.learning_starts = 5000
 
-# Configure optimiser parameters if desired
-if config["learningRate"] != None:
-    optimParams = model.policy.optimizer.state_dict()
-    optimParams["param_groups"][0]["lr"] = config["learningRate"]
-    model.policy.optimizer.load_state_dict( optimParams )
+# Apply optional parameters
+try:
+    if modelclass == DDPG and config["tau"] != None: model.tau = config["tau"]
+    if modelclass == PPO and config["epsilon"] != None: 
+        def clip_range(_):
+            return config["epsilon"]
+        model.clip_range = clip_range
+except KeyError:
+    pass
 
+# Configure learning rate if desired
+if config["learningRate"] != None:
+    model.learning_rate = config["learningRate"]
 
 ## Start training
 model.learn(total_timesteps=config["trainingTimesteps"], tb_log_name="{}_{}".format(config["modelname"], config["modelrun"]))
