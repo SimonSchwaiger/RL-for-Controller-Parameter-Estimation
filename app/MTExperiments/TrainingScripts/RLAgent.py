@@ -61,33 +61,39 @@ else:
 ## Instantiate model of correct class
 modelclass = eval(config["modelclass"])
 
-if config["policyNetwork"] != None and config["activation"] != None:
-    # If custom network architecture is provided, initialise the model using that
-    policy_kwargs = dict(
-        activation_fn = eval(config["activation"]),
-        net_arch = config["policyNetwork"]
-    )
-    model = modelclass("MlpPolicy", env, tensorboard_log="{}/tensorboard".format(config["logdir"]), policy_kwargs=policy_kwargs, verbose=1)
-else:
-    # Otherwise, initialise the default model
-    model = modelclass("MlpPolicy", env, tensorboard_log="{}/tensorboard".format(config["logdir"]), verbose=1)
+# Set kwargs for model instantiation
+kwargs = {}
 
-# If the modelclass is DQN, reduce the warmup phase from 50000 to 5000 steps
-if modelclass == DQN: model.learning_starts = 5000
+# Check and apply custom architecture
+if config["policyNetwork"] != None and config["activation"] != None:
+    kwargs.update({
+        "policy_kwargs": dict(
+            activation_fn = eval(config["activation"]),
+            net_arch = config["policyNetwork"]
+        )
+    })
+
+# Configure learning rate if desired
+if config["learningRate"] != None: kwargs.update({ "learning_rate": config["learningRate"] })
 
 # Apply optional parameters
 try:
-    if modelclass == DDPG and config["tau"] != None: model.tau = config["tau"]
+    if modelclass == DDPG and config["tau"] != None: kwargs.update({ "tau":config["tau"] })
     if modelclass == PPO and config["epsilon"] != None: 
         def clip_range(_):
             return config["epsilon"]
-        model.clip_range = clip_range
+        kwargs.update({ "clip_range": clip_range })
+    if modelclass == PPO and config["n_steps"] != None: kwargs.update({ "n_steps":config["n_steps"] })
+    if modelclass == PPO and config["gae_lambda"] != None: kwargs.update({ "gae_lambda":config["gae_lambda"] })
 except KeyError:
     pass
 
-# Configure learning rate if desired
-if config["learningRate"] != None:
-    model.learning_rate = config["learningRate"]
+# Instantiate model
+model = modelclass("MlpPolicy", env, tensorboard_log="{}/tensorboard".format(config["logdir"]), verbose=1, **kwargs)
+
+
+# If the modelclass is DQN, reduce the warmup phase from 50000 to 5000 steps
+if modelclass == DQN: model.learning_starts = 5000
 
 ## Start training
 model.learn(total_timesteps=config["trainingTimesteps"], tb_log_name="{}_{}".format(config["modelname"], config["modelrun"]))
