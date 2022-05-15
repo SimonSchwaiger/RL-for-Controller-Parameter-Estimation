@@ -45,7 +45,7 @@ config = {
 }
 """
 
-runTraining = True      # Determines, whether or not training is conducted or only visualisation is performed
+runTraining = False      # Determines, whether or not training is conducted or only visualisation is performed
 trainingSteps = 10000   # Determines performed training steps
 
 # Start tensorboard to allow for visualisation of training process
