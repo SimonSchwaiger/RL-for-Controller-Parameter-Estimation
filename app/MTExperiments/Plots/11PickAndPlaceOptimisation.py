@@ -8,11 +8,13 @@ source /catkin_ws/devel/setup.bash
 
 python
 
+from cgi import test
 import subprocess
 import os
 import sys
 import time
 import itertools
+import copy
 sys.path.append("/catkin_ws/src/jointcontrol/scripts")
 sys.path.append("/app/MTExperiments/TrainingScripts")
 
@@ -50,27 +52,11 @@ put down pose
 [-1.988591, -1.398532, -1.617373]
 
 
-
-# CREATE PATH CONFIGURATIONS
-poses = np.array([
-    [0.635761, -0.459321, -1.147022],       # Pick up
-    [0.068747, -1.772611, -0.514472],       # Home
-    [-1.988591, -1.398532, -1.617373]       # Put down
-])
-
-joint = 2
-
-arr = poses[:,joint]
-for L in range(2, len(arr)+1):
-    for subset in itertools.combinations(arr, L):
-        print(subset)
-
-
-"""
+aux pose
+[-0.719315, -2.459165, -2.211645]
 
 
 
-# Joint2 Config
 resetConfig = { 
     "sampleRandom": True,
     "timePosSeries": [
@@ -83,88 +69,94 @@ resetConfig = {
     "maxSteps": 40 
 }
 
+"""
 
-#############################################################################
-## DQN Discrete
 
-DQNConfig = {
-    "jointID": 0,
-    "logdir": logdir,
-    "modelclass": "DQN",
-    "modelrun": 0,
-    "modelname": "DQN",
-    "learningRate": None, 
-    "trainingTimesteps": trainingSteps,
-    "policyNetwork": None,
-    "optimizer": None,
-    "discretisation": 0.05,
-    "resetConfig": resetConfig,
-    "trajectoryType": "generator"
-}
+def createJointTrajectoryConfig(poses, joint, cycleTime):
+    """ Creates a configuration depicting all trajectories to move between poses. """
+    arr = poses[:,joint]
+    trajectories = []
+    for subset in itertools.combinations(arr, 2):
+        trajectories.append(list(subset))
+    #
+    trajectoriesrev = copy.deepcopy(trajectories)
+    trajectories.reverse()
+    trajectories += trajectoriesrev
+    #
+    # Format them with the correct cycle time as the env config
+    timePosSeries = []
+    for entry in trajectories:
+        timePosSeries.append(
+            {
+                "times": np.arange(0, cycleTime*(len(entry)), cycleTime).tolist(),
+                "positions": entry
+            }
+        )
+    #
+    return { 
+        "sampleRandom": True,
+        "timePosSeries": timePosSeries,
+        "samplesPerStep": 180, 
+        "maxSteps": 40 
+    }
 
+# CREATE PATH CONFIGURATIONS
+poses = np.array([
+    [0.635761, -0.459321, -1.147022],       # Pick up
+    [0.068747, -1.772611, -0.514472],       # Home
+    [-1.988591, -1.398532, -1.617373],      # Put down
+    [-0.719315, -2.459165, -2.211645]       # Aux
+])
+
+
+#j0Config = createJointTrajectoryConfig(poses, 0, 1.5)
+#j1Config = createJointTrajectoryConfig(poses, 1, 1.5)
+#j2Config = createJointTrajectoryConfig(poses, 2, 1.5)
+
+
+configs = [ createJointTrajectoryConfig(poses, j, 1.5) for j in range(3) ]
 
 #############################################################################
 ## DDPG Continuous
 
-DDPGConfig = {
-    "jointID": 0,
-    "logdir": logdir,
-    "modelclass": "DDPG",
-    "modelrun": 0,
-    "modelname": "DDPG",
-    "learningRate": 0.0001,
-    "tau": 0.002,  
-    "trainingTimesteps": trainingSteps,
-    "policyNetwork": None,
-    "optimizer": None,
-    "discretisation": None,
-    "resetConfig": resetConfig,
-    "trajectoryType": "generator"
-}
-
-#############################################################################
-## PPO Discrete
-
-PPODiscreteConfig = {
-    "jointID": 0,
-    "logdir": logdir,
-    "modelclass": "PPO",
-    "modelrun": 0,
-    "modelname": "PPO_Discrete",
-    "learningRate": 0.0003,
-    "epsilon": 1,
-    "n_steps": 512,
-    "gae_lambda": 0.9,
-    "trainingTimesteps": trainingSteps,
-    "policyNetwork": None,
-    "optimizer": None,
-    "discretisation": 0.05,
-    "resetConfig": resetConfig,
-    "trajectoryType": "generator"
-}
-
-
+def getDDPGConfig(jointID, resetConfig, run):
+    return {
+        "jointID": 0,
+        "logdir": logdir,
+        "modelclass": "DDPG",
+        "modelrun": 0,
+        "modelname": "DDPG_jid{}_".format(jointID, run),
+        "learningRate": 0.0001,
+        "tau": 0.002,  
+        "trainingTimesteps": trainingSteps,
+        "policyNetwork": None,
+        "optimizer": None,
+        "discretisation": None,
+        "resetConfig": resetConfig,
+        "trajectoryType": "generator"
+    }
 
 #############################################################################
 ## PPO Continuous
 
-PPOContinuousConfig = {
-    "jointID": 0,
-    "logdir": logdir,
-    "modelclass": "PPO",
-    "modelrun": 0,
-    "modelname": "PPOContinuous",
-    "learningRate": 0.0003,
-    "epsilon": 1,
-    "n_steps": 512,
-    "gae_lambda": 0.9,
-    "trainingTimesteps": trainingSteps,
-    "policyNetwork": None,
-    "optimizer": None,
-    "discretisation": None,
-    "resetConfig": resetConfig,
-    "trajectoryType": "generator"
-}
+def getPPOConfig(jointID, resetConfig, run):
+    return {
+        "jointID": 0,
+        "logdir": logdir,
+        "modelclass": "PPO",
+        "modelrun": 0,
+        "modelname": "PPOCont_jid{}_".format(jointID, run),
+        "learningRate": 0.0003,
+        "epsilon": 1,
+        "n_steps": 512,
+        "gae_lambda": 0.9,
+        "trainingTimesteps": trainingSteps,
+        "policyNetwork": None,
+        "optimizer": None,
+        "discretisation": None,
+        "resetConfig": resetConfig,
+        "trajectoryType": "generator"
+    }
 
 
 # Debug: for one environment
@@ -175,192 +167,43 @@ PPOContinuousConfig = {
 #############################################################################
 ## RUN Training Episodes for each Algorithm
 
-def runAgentTests(config, testRuns=5):
-    """ Performs testRuns """
-    print("Running {} training sequences".format(config["modelname"]))
-    processes = [None for _ in range(testRuns)]
-    #
-    for i in range(testRuns):
-        # Start process in the background
-        config["jointID"] = i
-        config["modelrun"] = i
-        processes[i] = subprocess.Popen([sys.executable, agentPath, str(config)])#, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-        # Wait for env to register
-        time.sleep(1)
-    #
-    # Wait for processes to finish and record return codes
-    rc = []
-    for i in range(testRuns):
-        streamdata = processes[i].communicate()[0]
-        rc.append(processes[i].returncode)
-    #
-    print("{} agent tests successfully exited with return codes {}".format(config["modelname"], rc))
+repeatRuns = 3
+envJoints = 6
+trainingConfigs = []
 
-# Perform testruns of all configurations
-if runTraining:
-    runAgentTests(DQNConfig)
-    runAgentTests(DDPGConfig)
-    runAgentTests(PPODiscreteConfig)
-    runAgentTests(PPOContinuousConfig)
+for run in range(repeatRuns):
+    for idx, config in enumerate(configs):
+        trainingConfigs.append(getDDPGConfig(idx, config, run))
 
+for run in range(repeatRuns):
+    for idx, config in enumerate(configs):
+        trainingConfigs.append(getPPOConfig(idx, config, run))
 
+def chunker(seq, size):
+    return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
-
-#############################################################################
-## VISUALISE AVERAGE RETURN IN TRAINING
-
-import scipy.stats as st
-import math
-
-# Load Tensorboard Logs
-#https://gist.github.com/willwhitney/9cecd56324183ef93c2424c9aa7a31b4
-from tensorboard.backend.event_processing import event_accumulator
-
-## Matplotlib imports
-import matplotlib.pyplot as plt
-import matplotlib
-
-matplotlib.style.use("default")
-
-## Import thesis colours
-sys.path.append("/app/MTExperiments/Plots")
-from colourmaps import *
-
-
-def loadTensorboardLog(config, testRuns=5):
-    """ Loads tensorboard logs from runs and returns their entries as one big list """
-    rewards = []
-    #
-    for run in range(testRuns):
-        logPath = "{}/tensorboard/{}_{}_1".format(config["logdir"], config["modelname"], run)
-        ea = event_accumulator.EventAccumulator(logPath, size_guidance={event_accumulator.SCALARS: 0})
-        ea.Reload()
-        rewards.append([ entry.value for entry in ea.Scalars("rollout/ep_rew_mean") ])
-    #
-    return rewards
-
-
-def getConfidenceInterval(a):
-    """ Returns mean, upper and lower bounds of a 95% confidence interval of given values """
-    tmp = st.norm.interval(0.95, loc=np.mean(a), scale=np.std(a)/math.sqrt(len(a)))
-    return np.mean(a), tmp[0], tmp[1]
-
-
-def computeGraphArrays(meanEpRewards, runs=5, lenPlot=15000):
-    """ Computes the graph lists from mean episode reward of multiple agent runs """
-    meanList = []
-    lowerList = []
-    upperList = []
-    # Get length of shortest episode
-    episodes = 0
-    for run in range(runs):
-        if episodes == 0: episodes = len(meanEpRewards[run])
-        else: episodes = min(episodes, len(meanEpRewards[run]) )
-    #
-    # Iterate over episodes
-    for episode in range(episodes):
-        mean, lower, upper = getConfidenceInterval(
-            [ meanEpRewards[run][episode] for run in range(runs) ]
-        )
-        meanList.append(mean)
-        lowerList.append(lower)
-        upperList.append(upper)
-    #
-    # Return lists
-    interval = lenPlot/episodes
-    timesteps = np.arange(episodes)*(lenPlot/(episodes-1))
-    timesteps = np.around(timesteps, decimals=0, out=None)
-    return timesteps, meanList, lowerList, upperList
-
-
-def loadRandomResults(config, testRuns=5, episode_len=40, smoothingFactor=20):
-    """ Loads random agent results based on configuration """
-    ret = []
-    for run in range(testRuns):
-        filename = "{}/tensorboard/{}_{}_1.npy".format(config["logdir"], config["modelname"], run)
-        # Load reward list
-        rewardlist = np.load(filename, allow_pickle=True).tolist()
-        # Helper funciton for iterating over list in chunks
-        # https://stackoverflow.com/questions/434287/what-is-the-most-pythonic-way-to-iterate-over-a-list-in-chunks
-        def chunker(seq, size):
-            return (seq[pos:pos + size] for pos in range(0, len(seq), size))
-        # Scale list to total episode reward for an episode of length 40
-        episodicReward = []
-        for segment in chunker(rewardlist, episode_len):
-            episodicReward.append(np.sum(segment))
-        # Sample mean return over an interval of episodes to smooth out curve
-        rewardList = []
-        for segment in chunker(episodicReward, smoothingFactor):
-            rewardList.append(np.mean(segment))
-        # Add smoothed rewards to return list
-        ret.append(rewardList)
-    #
-    return ret
-
-
-## Set matplotlib figure size as seen here
-# https://stackoverflow.com/questions/44970010/axes-class-set-explicitly-size-width-height-of-axes-in-given-units
-def set_size(w,h, ax=None):
-    """ w, h: width, height in inches """
-    if not ax: ax=plt.gca()
-    l = ax.figure.subplotpars.left
-    r = ax.figure.subplotpars.right
-    t = ax.figure.subplotpars.top
-    b = ax.figure.subplotpars.bottom
-    figw = float(w)/(r-l)
-    figh = float(h)/(t-b)
-    ax.figure.set_size_inches(figw, figh)
-
-
-## Iterate over config files and load tensorboard results
-tensorbaordResults = []
-for config in [DQNConfig, DDPGConfig, PPODiscreteConfig, PPOContinuousConfig]:
-    tensorbaordResults.append(loadTensorboardLog(config))
-
-# Add random agent to results
-tensorbaordResults.append(loadRandomResults(RandomConfig))
-
-## Configure plot
-plt.rcParams.update({'font.size': 12})
-
-data = tensorbaordResults
-labels = ["DQN", "DDPG", "PPO Discrete", "PPO Continuous", "Random Agent"]
-lines = ['-', '--', '-', '-.', ':']
-
-colours = [
-    colourScheme1["darkblue"],
-    colourScheme2["twblue"],
-    colourScheme1["lightblue"],
-    colourScheme2["yellow"],
-    colourScheme1["twgrey"]
-]
-
-## Plot everything
-fig, ax = plt.subplots()
-for i, d in enumerate(data):
-    x, y, cl, cu = computeGraphArrays(d)
-    ax.plot(x,y,color=colours[i], label=labels[i], linestyle=lines[i])
-    ax.fill_between(x, cl, cu,color=colours[i], alpha=.1)
-
-
-plt.suptitle("Agent Training with optimised Hyperparameters", fontsize=16)
-plt.xlabel('Training Steps')
-plt.ylabel('Mean Return')
-#plt.xlim([-12500, 1000])
-plt.ylim([-80, -10])
-plt.grid()
-plt.legend()
-
-set_size(7,4)
-
-plt.tight_layout()
-plt.subplots_adjust(top = 0.93)
-
-plt.savefig("/app/resultsStepResponseTrainingOptimisedParams.pdf", bbox_inches='tight')
-plt.show()
-
-
-
+# Iterate over all runs and apply them to the correct joint
+if runTraining == True:
+    for config in chunker(trainingConfigs, envJoints):
+        print("Starting new training batch:")
+        print([ c["modelname"] for c in config ])
+        # New training cycle
+        processes = [None for _ in range(envJoints)]
+        for i, c in enumerate(config):
+            c["jointID"] = i
+            # Start process and keep track of it
+            processes[i] = subprocess.Popen([sys.executable, agentPath, str(c)])#, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+            # Wait for env to register
+            time.sleep(1)
+        # Wait for processes to finish and check return code
+        rc = []
+        for i in range(envJoints):
+            if processes[i] != None:
+                streamdata = processes[i].communicate()[0]
+                rc.append(processes[i].returncode)
+        #
+        # Print success and start with next batch
+        print("Batch Agent tests successfully exited with return codes {}".format(rc))
 
 
 
@@ -409,9 +252,9 @@ evalEpisodeResults = []
 def chunker(seq, size):
     return (seq[pos:pos + size] for pos in range(0, len(seq), size))
 
-for config in [DQNConfig, DDPGConfig, PPODiscreteConfig, PPOContinuousConfig, RandomConfig]:
+for config in trainingConfigs:
     # Load eval episode result dict
-    rawEvalRewards = loadTestepisodeResults(config)
+    rawEvalRewards = loadTestepisodeResults(config, testRuns=1)
     # Sum episodes up in order to match graph scale to the average return
     #episodeRewards = [ np.sum(segment) for segment in chunker(rawEvalRewards[0]["evalEpisodeRewards"], episodeLength) ]
     #evalEpisodeResults.append(episodeRewards)
@@ -424,17 +267,25 @@ import gym
 from discreteActionWrapper import *
 from multiprocessing import resource_tracker
 
-# Make environment
-env = gym.make('jointcontrol-v0', jointidx=6)
-env.reset(episodeType="step", config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 })
-_, referenceReward, _, _ = env.step(None)
-resource_tracker.unregister(env.env.physicsCommand.shm._name, 'shared_memory')
-env.env.closeSharedMem()
+# Make environments for reference performance
+envIDs = [6, 7, 8]
+evaluationSteps = 400
+defaultParamResults = []
+
+for eID in envIDs:
+    env = gym.make('jointcontrol-v0', jointidx=eID)
+    envresults = []
+    for ev in range(evaluationSteps):
+        _ = env.reset(episodeType="generator", config=configs[eID-6])
+        _, referenceReward, _, _ = env.step(None)
+        envresults.append(referenceReward)
+    defaultParamResults.append(envresults)
+    resource_tracker.unregister(env.env.physicsCommand.shm._name, 'shared_memory')
+    env.env.closeSharedMem()
+
 
 ## Set up plot (2 Plots side-by-side) both plotting per step reward with default parameter performance as a reference
 # One plot also includes the random agent
-
-labels = ["DQN", "DDPG", "PPO(D)", "PPO(C)", "Random"]
 
 linecolour = colourScheme1["darkblue"]
 meadianlinecolour = colourScheme1["twblue"]
@@ -444,10 +295,27 @@ referenceColour = colourScheme2["yellow"]
 boxwidth = 0.3
 
 plt.rcParams.update({'font.size': 12})
-fig, (ax0, ax1) = plt.subplots(1,2, sharey=False)
+fig, (ax0, ax1, ax2) = plt.subplots(1, 3, sharey=True)
+
+
+# Get best ddpg and ppo performer
+bestDDPGPerformer = []
+
+for i in range(3):
+    tmp = [ evalEpisodeResults[0+i], evalEpisodeResults[3+i], evalEpisodeResults[6+i] ]
+    idx = np.argmax( [ np.mean(entry) for entry in tmp ] )
+    bestDDPGPerformer.append(tmp[idx])
+
+bestPPOPerformer = []
+
+for i in range(3):
+    tmp = [ evalEpisodeResults[9+i], evalEpisodeResults[12+i], evalEpisodeResults[15+i] ]
+    idx = np.argmax( [ np.mean(entry) for entry in tmp ] )
+    bestPPOPerformer.append(tmp[idx])
+
 
 box0 = ax0.boxplot(
-    evalEpisodeResults[:4], labels=labels[:4], notch=False, showfliers=True, patch_artist=True, widths=boxwidth*0.8,
+    defaultParamResults, notch=False, showfliers=False, patch_artist=True, widths=boxwidth*0.8,
     boxprops=dict(facecolor=fillcolour, color=linecolour),
     capprops=dict(color=linecolour),
     whiskerprops=dict(color=linecolour),
@@ -456,7 +324,7 @@ box0 = ax0.boxplot(
 )
 
 box1 = ax1.boxplot(
-    evalEpisodeResults[:4], labels=labels[:4], notch=False, showfliers=False, patch_artist=True, widths=boxwidth*0.8,
+    bestDDPGPerformer, notch=False, showfliers=False, patch_artist=True, widths=boxwidth*0.8,
     boxprops=dict(facecolor=fillcolour, color=linecolour),
     capprops=dict(color=linecolour),
     whiskerprops=dict(color=linecolour),
@@ -464,29 +332,105 @@ box1 = ax1.boxplot(
     medianprops=dict(color=meadianlinecolour),
 )
 
-# Add reference control error
-ax0.axhline(y=referenceReward, xmin=0.05, xmax=0.95, linestyle="--", color=referenceColour, label="Default Controller Parameters")
-ax1.axhline(y=referenceReward, xmin=0.05, xmax=0.95, linestyle="--", color=referenceColour, label="Default Controller Parameters")
+box2 = ax2.boxplot(
+    bestPPOPerformer, notch=False, showfliers=False, patch_artist=True, widths=boxwidth*0.8,
+    boxprops=dict(facecolor=fillcolour, color=linecolour),
+    capprops=dict(color=linecolour),
+    whiskerprops=dict(color=linecolour),
+    flierprops=dict(color=fillcolour, markeredgecolor=linecolour),
+    medianprops=dict(color=meadianlinecolour),
+)
+
+
+
 
 # Format axes, set size and plot
 ax0.grid()
 ax1.grid()
-
-ax0.legend()
+ax2.grid()
 
 ax0.set_ylabel("Negative Mean Squared Control Error")
 
-ax0.set_title("With Outliers") 
-ax1.set_title("Without Outliers")
+ax0.set_title("Default Controller Parameters") 
+ax1.set_title("DDPG")
+ax2.set_title("PPO")
 
-fig.suptitle("Controller Evaluation with optimised Hyperparameters", fontsize=16)
+ax0.set_xticks([1, 2, 3], ['J1', 'J2', 'J3'])
+ax1.set_xticks([1, 2, 3], ['J1', 'J2', 'J3'])
+ax2.set_xticks([1, 2, 3], ['J1', 'J2', 'J3'])
+
+fig.suptitle("Trajectory Control For Pick and Place Task", fontsize=16)
 
 set_size(7,3.6)
 plt.tight_layout()
 
 plt.subplots_adjust(top = 0.862)
 
-plt.savefig("/app/resultsStepResponseOptimisedHyperparametersControlErrorBox.pdf", bbox_inches='tight')
+plt.savefig("/app/resultsPickAndPlaceControllerOptimisation.pdf", bbox_inches='tight')
 plt.show()
+
+
+
+
+
+
+
+c2 = colourScheme1["darkblue"]
+c1 = colourScheme2["twblue"]
+
+
+commandsignal = [0] + [1.57 for i in range(149)]
+simsignal = [ 1.57*i/150 for i in range(150) ]
+time = np.array(range(0, 150))*0.01
+
+fig, axs = plt.subplots(2, 2, sharey=True, sharex=True)
+axs[0,0].plot(time, simsignal, label="Actuator Position", color=c1)
+axs[0,0].plot(time, commandsignal, label="ReferenceSignal", color=c2)
+
+axs[0,1].plot(time, simsignal, label="Actuator Position", color=c1)
+axs[0,1].plot(time, commandsignal, label="ReferenceSignal", color=c2)
+
+axs[1,0].plot(time, simsignal, label="Actuator Position", color=c1)
+axs[1,0].plot(time, commandsignal, label="ReferenceSignal", color=c2)
+
+axs[1,1].plot(time, simsignal, label="Actuator Position", color=c1)
+axs[1,1].plot(time, commandsignal, label="ReferenceSignal", color=c2)
+
+axs[1,0].set_ylabel("Time[sec]")
+axs[0,0].set_ylabel("Time[sec]")
+
+axs[1,0].set_xlabel("Position [rad]")
+axs[1,1].set_xlabel("Position [rad]")
+
+axs[1,1].legend()
+
+plt.suptitle("Controller Parameter Estimation in Robot Operation ")
+
+set_size(7,5)
+plt.subplots_adjust(top = 0.936, wspace=0.07, hspace=0.0043)
+
+
+plt.savefig("/app/dummy.pdf", bbox_inches='tight')
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+# Calculate percentual decrease in control error:
+errorReductionPercent = []
+for defaultEntry, entry in zip(defaultParamResults, evalEpisodeResults[3:6]):
+    errorReductionPercent.append((1-(max(entry)/max(defaultEntry)))*100)
+
+print("Best case error reduction [%]: {} ".format(errorReductionPercent))
+
+
+
 
 

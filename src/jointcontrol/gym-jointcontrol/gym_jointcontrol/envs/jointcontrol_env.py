@@ -215,7 +215,7 @@ class jointcontrol_env(gym.Env):
         #self.torqueControlUpdate(0)
         #self.waitForPhysicsUpdate()
         # Set joint to initial position
-        while abs( self.getJointState()[0] - self.controlSignal[0]) > 0.05:
+        while abs( self.getJointState()[0] - self.controlSignal[0]) > 0.01:
             self.positionControlUpdate(cmdForce=100, cmdPos=self.controlSignal[0])
             self.waitForPhysicsUpdate()
         # Deactivate position control before proceeding
@@ -358,7 +358,7 @@ class jointcontrol_env(gym.Env):
             """ Creates and configures an input signal based on the hebi trajectory generator """
             # Create trajectory using hebi utils and store position
             res = createTrajectory(config, ts=self.ts)
-            self.controlSignal = res[:,0][0]
+            self.controlSignal = res[:,0].flatten()
             self.maxSteps = config["maxSteps"]
 
         # Create dict to mimick switch statement between different modes

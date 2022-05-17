@@ -17,7 +17,8 @@ rosrun xacro xacro -o TrainingTestbench.urdf TrainingTestbench.xacro
 cd /app
 
 ## Load controller configuration as ROS parameters
-python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcontrol)/config/testbenchConfig.json
+#python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcontrol)/config/testbenchConfig.json
+python /catkin_ws/src/jointcontrol/config/parseConfig.py $(rospack find jointcontrol)/config/saimonConfig.json
 
 ## Start shared memory physics server
 # Headless
@@ -42,3 +43,4 @@ jupyter-lab --ip 0.0.0.0 -NotebookApp.token='smart_control' --no-browser --allow
 # Start interactive shell to sit idle and keep everything running
 #bash
 python
+

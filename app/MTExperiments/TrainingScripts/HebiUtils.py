@@ -60,4 +60,3 @@ if __name__=="__main__":
     plt.plot(time, np.array(res)[:,0])
     plt.show()
 
-

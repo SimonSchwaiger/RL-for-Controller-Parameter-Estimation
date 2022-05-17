@@ -111,6 +111,7 @@ class bulletInstance:
     def addUrdf(self, name, pos=[0,0,0], path=None, note=None):
         """ Loads URDF into pybullet sim. If path is set, it will be used as the search path """
         if path != None: p.setAdditionalSearchPath(path)
+        print("robotname: {}".format(name))
         robotId = p.loadURDF(name, basePosition=pos)
         self.activeModels.append([note, name, robotId])
         # Wait for model to be loaded

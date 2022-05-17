@@ -27,6 +27,24 @@ else:
     env = gym.make('jointcontrol-v0', jointidx = 0) 
 
 
+# Joint2 Config
+resetConfig = { 
+    "sampleRandom": True,
+    "timePosSeries": [
+        {"times": [0, 1.5, 3], "positions": [-1.147022, -0.514472, -1.147022]},
+        {"times": [0, 1.5, 3], "positions": [-1.147022, -1.617373, -1.147022]},
+        {"times": [0, 1.5, 3], "positions": [-0.514472, -1.617373, -0.514472]},
+        {"times": [0, 1.5, 3], "positions": [-1.147022, -0.514472, -1.617373]}
+    ],          
+    "samplesPerStep": 350, 
+    "maxSteps": 40 
+}
+
+
+
+env.reset(config=resetConfig, episodeType="generator")
+
+
 
 env.reset(config={ "initialPos":0, "stepPos":-1.57, "samplesPerStep":150, "maxSteps":40 })
 

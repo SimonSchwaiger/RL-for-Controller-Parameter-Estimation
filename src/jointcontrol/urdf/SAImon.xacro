@@ -21,12 +21,12 @@
   <xacro:link_nocap type="X5" extension="0.175" twist="${0}" name="elbow_wrist" child="end_effector" output="Inline"/>
 
   <link name="end_effector/INPUT_INTERFACE">
-    <visual>
+    <!--visual>
       <origin rpy="0 ${1.5*pi} 0" xyz="0 0 0"/>
       <geometry>
         <mesh filename="package://saimon/meshes/endeffector_assembly.stl" scale="0.001 0.001 0.001"/>
       </geometry>
-    </visual>
+    </visual-->
   </link>
 
   <joint name="end_effector/OUTPUT_JOINT" type="fixed">

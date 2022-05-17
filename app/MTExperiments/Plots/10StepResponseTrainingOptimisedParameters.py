@@ -7,6 +7,7 @@ source /catkin_ws/devel/setup.bash
 
 python
 
+from distutils.log import error
 import subprocess
 import os
 import sys
@@ -43,7 +44,7 @@ config = {
 }
 """
 
-runTraining = True      # Determines, whether or not training is conducted or only visualisation is performed
+runTraining = False      # Determines, whether or not training is conducted or only visualisation is performed
 trainingSteps = 15000   # Determines performed training steps
 
 # Start tensorboard to allow for visualisation of training process
@@ -506,4 +507,14 @@ plt.subplots_adjust(top = 0.862)
 plt.savefig("/app/resultsStepResponseOptimisedHyperparametersControlErrorBox.pdf", bbox_inches='tight')
 plt.show()
 
+
+
+# Calculate percentual decrease in control error:
+print("Raw achieved control offsets: {}".format( [ np.mean(entry) for entry in evalEpisodeResults ] ))
+
+errorReductionPercent = []
+for entry in evalEpisodeResults[:4]:
+    errorReductionPercent.append((1-(np.mean(entry)/referenceReward))*100)
+
+print("Best case error reduction [%]: {} ".format(errorReductionPercent))
 

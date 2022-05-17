@@ -1,44 +1,99 @@
 {
     "ParamNamespace": "jointcontrol",
-    "NumJoints": 3,
+    "NumJoints": 9,
+    "J0": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 7,
+        "ParamDescription": "PID PID PID"
+    },    
     "J1": {
         "NumParams": 9,
-        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "Maximums": [30, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
-        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
-        "RobotID": 0,
-        "BodyID": 0,
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 14,
         "ParamDescription": "PID PID PID"
     },
     "J2": {
         "NumParams": 9,
-        "Defaults": [30, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "Maximums": [30, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
-        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
-        "ParamDescription": "PID PID PID"  
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 7,
+        "ParamDescription": "PID PID PID"
     },
     "J3": {
         "NumParams": 9,
-        "Defaults": [30, 0, 0, 0.05, 0, 0, 0, 0, 0],
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
         "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        "Maximums": [30, 0.2, 0.2, 0.5, 0.2, 0.2, 0.5, 0.2, 0.2],
-        "MaxChange": [10, 0.1, 0.1, 10, 0.1, 0.1, 10, 0.1, 0.1],
-        "ParamDescription": "PID PID PID"  
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 7,
+        "ParamDescription": "PID PID PID"
     },
+    "J4": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 14,
+        "ParamDescription": "PID PID PID"
+    },
+    "J5": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 7,
+        "ParamDescription": "PID PID PID" 
+    },   
+    "J6": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 7,
+        "ParamDescription": "PID PID PID"
+    },   
+    "J7": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 14,
+        "ParamDescription": "PID PID PID" 
+    },   
+    "J8": {
+        "NumParams": 9,
+        "Defaults": [30, 0, 0, 0.05, 0, 0, 0.25, 0, 0.001],
+        "Minimums": [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        "Maximums": [40, 1, 1, 10, 1, 1, 5, 1, 1],
+        "MaxChange": [10, 0.1, 0.1, 2.5, 0.1, 0.1, 1, 0.1, 0.1],
+        "MaxTorque": 7,
+        "ParamDescription": "PID PID PID"
+    }, 
     "SimParams": {
-        "JointLinearDamping": [0.04, 0.04, 0.04],
-        "JointAangularDamping":     [70, 70, 70],
-        "JointTorques":           [7.5, 17, 7.5],
+        "JointLinearDamping":       [25, 25, 25],
+        "JointAngularDamping":   [150, 150, 150],
+        "JointMaxVelocity":   [1.45, 1.45, 1.45],
         "Ts":                               0.01,
-        "NumRobots":                           1,
+        "NumRobots":                           3,
         "JointsPerRobot":                      3,
         "IdsWithinRobot":              [1, 3, 5],
         "Realtime":                      "False",
-        "StationSize":                    [3, 3],
+        "StationSize":                    [1, 1],
         "StationsPerCol":                      3,
-        "URDFName":                "SAImon.urdf",
-        "URDFPath":      "/src/jointcontrol/urdf"
+        "URDFName":                ["SAImon.urdf", "SAImon.urdf", "SAImon.urdf"],
+        "URDFPath":      "/catkin_ws/src/jointcontrol/urdf"
     }
 }
