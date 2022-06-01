@@ -8,7 +8,6 @@ source /catkin_ws/devel/setup.bash
 
 python
 
-from cgi import test
 import subprocess
 import os
 import sys
@@ -19,6 +18,9 @@ sys.path.append("/catkin_ws/src/jointcontrol/scripts")
 sys.path.append("/app/MTExperiments/TrainingScripts")
 
 import numpy as np
+from scipy import stats
+
+from HebiUtils import *
 
 """ 
 
@@ -71,8 +73,7 @@ resetConfig = {
 
 """
 
-
-def createJointTrajectoryConfig(poses, joint, cycleTime):
+def createAllJointTrajectoryConfigs(poses, joint, cycleTime):
     """ Creates a configuration depicting all trajectories to move between poses. """
     arr = poses[:,joint]
     trajectories = []
@@ -100,14 +101,44 @@ def createJointTrajectoryConfig(poses, joint, cycleTime):
         "maxSteps": 40 
     }
 
+def createJointTrajectoryConfig(poses, joint, cycleTime):
+    """ Creates a configuration depicting all trajectories to move between poses. """
+    arr = poses[:,joint]
+    trajectories = []
+    for i in range(len(arr)):
+        trajectories.append([arr[i-1], arr[i]])
+    #
+    # Format them with the correct cycle time as the env config
+    timePosSeries = []
+    for entry in trajectories:
+        timePosSeries.append(
+            {
+                "times": np.arange(0, cycleTime*(len(entry)), cycleTime).tolist(),
+                "positions": entry
+            }
+        )
+    #
+    return { 
+        "sampleRandom": True,
+        "timePosSeries": timePosSeries,
+        "samplesPerStep": 180, 
+        "maxSteps": 40 
+    }
+
+
 # CREATE PATH CONFIGURATIONS
 poses = np.array([
     [0.635761, -0.459321, -1.147022],       # Pick up
     [0.068747, -1.772611, -0.514472],       # Home
-    [-1.988591, -1.398532, -1.617373],      # Put down
-    [-0.719315, -2.459165, -2.211645]       # Aux
+    [-1.988591, -1.398532, -1.617373]       # Put down
 ])
 
+#poses = np.array([
+#    [0.635761, -0.459321, -1.147022],       # Pick up
+#    [0.068747, -1.772611, -0.514472],       # Home
+#    [-1.988591, -1.398532, -1.617373],      # Put down
+#    [-0.719315, -2.459165, -2.211645]       # Aux
+#])
 
 #j0Config = createJointTrajectoryConfig(poses, 0, 1.5)
 #j1Config = createJointTrajectoryConfig(poses, 1, 1.5)
@@ -115,6 +146,7 @@ poses = np.array([
 
 
 configs = [ createJointTrajectoryConfig(poses, j, 1.5) for j in range(3) ]
+
 
 #############################################################################
 ## DDPG Continuous
@@ -125,7 +157,7 @@ def getDDPGConfig(jointID, resetConfig, run):
         "logdir": logdir,
         "modelclass": "DDPG",
         "modelrun": 0,
-        "modelname": "DDPG_jid{}_".format(jointID, run),
+        "modelname": "DDPG_jid{}_{}".format(jointID, run),
         "learningRate": 0.0001,
         "tau": 0.002,  
         "trainingTimesteps": trainingSteps,
@@ -145,7 +177,7 @@ def getPPOConfig(jointID, resetConfig, run):
         "logdir": logdir,
         "modelclass": "PPO",
         "modelrun": 0,
-        "modelname": "PPOCont_jid{}_".format(jointID, run),
+        "modelname": "PPOCont_jid{}_{}".format(jointID, run),
         "learningRate": 0.0003,
         "epsilon": 1,
         "n_steps": 512,
@@ -205,6 +237,70 @@ if runTraining == True:
         # Print success and start with next batch
         print("Batch Agent tests successfully exited with return codes {}".format(rc))
 
+
+
+#############################################################################
+## Store joint feature, trajectory pairs for lookup during robot operation
+
+def getSignalFeatures(arr):
+    return np.array([
+        min(arr),
+        max(arr),
+        np.mean(arr),
+        stats.skew(arr),
+        stats.kurtosis(arr)
+    ])
+
+cycleTime = 1.5
+tmpconfigs = []
+
+# Get single trajectory config for each joint and joint trajectory
+for joint in range(3):
+    arr = poses[:,joint]
+    tmp = []
+    for i in range(len(arr)):
+        trajectory = [arr[i-1], arr[i]]
+        #
+        timePosSeries = [
+            {
+                "times": np.arange(0, cycleTime*(len(trajectory)), cycleTime).tolist(),
+                "positions": trajectory
+            }
+        ]
+        #
+        tmp.append(
+            { 
+                "sampleRandom": False,
+                "timePosSeries": timePosSeries,
+                "samplesPerStep": 180, 
+                "maxSteps": 40 
+            }
+        )
+    #
+    tmpconfigs.append(tmp)
+
+
+# Generate feature trajectory pairs
+lookup = []
+
+for joint, entry in enumerate(tmpconfigs):
+    tmp = []
+    for config in entry:
+        res = createTrajectory(config, ts=0.01)
+        controlSignal = res[:,0].flatten()
+        features = getSignalFeatures(controlSignal)
+        tmp.append( [controlSignal, features] )
+    #
+    lookup.append(tmp)
+
+# Convert lookup to array and save it
+with open("{}/lookup.npy".format( logdir ), "wb") as f:
+    np.save(f, np.array(
+        lookup
+    ))
+
+# Load lookup
+#lookup2 = np.load("{}/lookup.npy".format( logdir ), allow_pickle=True)
 
 
 
