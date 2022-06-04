@@ -33,7 +33,7 @@ files = np.array(files, dtype=str)[
 ]
 
 def detectStep(signal, thresshold = 0.001):
-    """ Detects a step greater than thresshold in input signal """
+    """ Detects a step greate than thresshold in input signal """
     idx = 0
     for i in range(len(signal-1)):
         if abs(signal[i] - signal[i+1]) > thresshold:
@@ -41,29 +41,29 @@ def detectStep(signal, thresshold = 0.001):
             break
     return idx
 
-def plotStep(filename, ts=0.002, stepDuration=3):
+def plotStep(filename, ts=0.002):
+    time = []
     cmd = []
     pos = []
     # Load csv
     with open(filename, newline='') as csvfile:
         reader = csv.reader(csvfile, delimiter=';')
         for row in reader:
+            time.append(row[2])
             cmd.append(row[3])
             pos.append(row[6])
     #
     # Convert data to floats
+    time = np.array(time[1:], dtype=np.float64)
     cmd = np.array(cmd[1:], dtype=np.float64)
     pos = np.array(pos[1:], dtype=np.float64)
     # Detect where step happens
     start = detectStep(cmd)
-    end = int(stepDuration/ts) + start
-    time = np.arange(0, len(cmd[start:end]))*ts
     # Plot functions
-    plt.plot(time, cmd[start:end])
-    plt.plot(time, pos[start:end])
-    plt.suptitle("{}".format(filename))
-    plt.xlabel = "Time [sec]"
+    plt.plot(cmd[start:])
+    plt.plot(pos[start:])
     plt.show()
+
 
 for filename in files:
     plotStep(filename)
