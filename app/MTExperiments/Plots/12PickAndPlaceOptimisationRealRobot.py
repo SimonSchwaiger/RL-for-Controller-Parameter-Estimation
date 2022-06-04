@@ -88,15 +88,15 @@ subplotTitles = [
 ]
 
 errorColours = [
-    colourScheme1["twblue"],    #J1
-    colourScheme1["lightblue"], #J2
-    colourScheme1["twgrey"]     #J3
+    colourScheme2["yellow"],    # Default
+    colourScheme1["darkblue"],  # DDPG Optimised
+    colourScheme1["twblue"]     # PPO Optimised
 ]
 
 trajectoryColours = [
-    colourScheme1["darkblue"],    #J1
-    colourScheme1["lightblue"], #J2
-    colourScheme2["yellow"]     #J3
+    colourScheme1["twblue"],   #J1
+    colourScheme1["twgrey"],   #J2
+    colourScheme2["yellow"]    #J3
 ]
 
 plotColours = [
@@ -107,11 +107,11 @@ plotColours = [
 ]
 
 errorLinestyles = [
-    "-", "-", "-."
+    "-", "-", ":"
 ]
 
 trajectoryLinestyles = [
-    "-", "-", "-."
+    "-", ":", "-."
 ]
 
 plotLinestyles = [
@@ -121,8 +121,23 @@ plotLinestyles = [
     [errorLinestyles, errorLinestyles]
 ]
 
+errorLabels = [
+    "Default", "DDPG", "PPO"
+]
+
+trajectoryLabels = [
+    "J1", "J2", "J3"
+]
+
+plotLables = [
+    [ trajectoryLabels, trajectoryLabels ],
+    [ errorLabels, errorLabels ],
+    [ errorLabels, errorLabels ],
+    [ errorLabels, errorLabels ]
+]
+
 plotLineThickness = [
-    [1.0, 1.0],
+    [1.2, 1.2],
     [0.7, 0.7],
     [0.7, 0.7],
     [0.7, 0.7]
@@ -183,7 +198,7 @@ for col in range(4):
     for row in range(2):
         # Plot all shuffled data
         for i in range(3):
-            axs[col][row].plot( plotData[col][row][0][i], plotData[col][row][1][i], c=plotColours[col][row][i], linewidth=plotLineThickness[col][row], ls=plotLinestyles[col][row][i] )
+            axs[col][row].plot( plotData[col][row][0][i], plotData[col][row][1][i], c=plotColours[col][row][i], linewidth=plotLineThickness[col][row], ls=plotLinestyles[col][row][i], label=plotLables[col][row][i] )
         # Set suptitle
         axs[col][row].set_title(subplotTitles[col][row])
         # Set axis limits
@@ -206,11 +221,24 @@ def set_size(w,h, ax=None):
     ax.figure.set_size_inches(figw, figh)
 
 fig.suptitle("Pick and Place Control Error", fontsize=16)
+axs[0][0].legend()
+axs[1][1].legend()
+
+axs[0][0].set_ylabel("Position [rad]")
+axs[1][0].set_ylabel("Control Error [rad]")
+axs[2][0].set_ylabel("Control Error [rad]")
+axs[3][0].set_ylabel("Control Error [rad]")
+
+axs[3][0].set_xlabel("Time[sec]")
+axs[3][1].set_xlabel("Time[sec]")
+
+axs[3][0].set_xticks(np.arange(4,14,2), [0, 2, 4, 6, 8])
+axs[3][1].set_xticks(np.arange(4,14,2), [0, 2, 4, 6, 8])
+
 set_size(7,7)
 plt.tight_layout()
+plt.subplots_adjust(wspace = 0.21, bottom = 0.064, top = 0.914)
+
+plt.savefig("/app/resultsRealRobotFeedbackPlot.pdf", bbox_inches='tight')
 plt.show()
 
-
-# TODO: Pos[rad] y labels
-# TODO: Time[sec] x labels
-# TODO: Line labels with legend

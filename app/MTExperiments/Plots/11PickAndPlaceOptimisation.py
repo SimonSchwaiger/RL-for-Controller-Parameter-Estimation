@@ -28,7 +28,7 @@ from HebiUtils import *
 
 """
 
-runTraining = True      # Determines, whether or not training is conducted or only visualisation is performed
+runTraining = False      # Determines, whether or not training is conducted or only visualisation is performed
 trainingSteps = 15000   # Determines performed training steps
 
 # Start tensorboard to allow for visualisation of training process
@@ -255,54 +255,52 @@ cycleTime = 1.5
 tmpconfigs = []
 
 # Get single trajectory config for each joint and joint trajectory
-for joint in range(3):
-    arr = poses[:,joint]
-    tmp = []
-    for i in range(len(arr)):
-        trajectory = [arr[i-1], arr[i]]
+if runTraining == True:
+    for joint in range(3):
+        arr = poses[:,joint]
+        tmp = []
+        for i in range(len(arr)):
+            trajectory = [arr[i-1], arr[i]]
+            #
+            timePosSeries = [
+                {
+                    "times": np.arange(0, cycleTime*(len(trajectory)), cycleTime).tolist(),
+                    "positions": trajectory
+                }
+            ]
+            #
+            tmp.append(
+                { 
+                    "sampleRandom": False,
+                    "timePosSeries": timePosSeries,
+                    "samplesPerStep": 180, 
+                    "maxSteps": 40 
+                }
+            )
         #
-        timePosSeries = [
-            {
-                "times": np.arange(0, cycleTime*(len(trajectory)), cycleTime).tolist(),
-                "positions": trajectory
-            }
-        ]
+        tmpconfigs.append(tmp)
+    #
+    # Generate feature trajectory pairs
+    lookup = []
+    #
+    for joint, entry in enumerate(tmpconfigs):
+        tmp = []
+        for config in entry:
+            res = createTrajectory(config, ts=0.01)
+            controlSignal = res[:,0].flatten()
+            features = getSignalFeatures(controlSignal)
+            tmp.append( [controlSignal, features] )
         #
-        tmp.append(
-            { 
-                "sampleRandom": False,
-                "timePosSeries": timePosSeries,
-                "samplesPerStep": 180, 
-                "maxSteps": 40 
-            }
-        )
+        lookup.append(tmp)
     #
-    tmpconfigs.append(tmp)
-
-
-# Generate feature trajectory pairs
-lookup = []
-
-for joint, entry in enumerate(tmpconfigs):
-    tmp = []
-    for config in entry:
-        res = createTrajectory(config, ts=0.01)
-        controlSignal = res[:,0].flatten()
-        features = getSignalFeatures(controlSignal)
-        tmp.append( [controlSignal, features] )
-    #
-    lookup.append(tmp)
-
-# Convert lookup to array and save it
-with open("{}/lookup.npy".format( logdir ), "wb") as f:
-    np.save(f, np.array(
-        lookup
-    ))
+    # Convert lookup to array and save it
+    with open("{}/lookup.npy".format( logdir ), "wb") as f:
+        np.save(f, np.array(
+            lookup
+        ))
 
 # Load lookup
 #lookup2 = np.load("{}/lookup.npy".format( logdir ), allow_pickle=True)
-
-
 
 
 #############################################################################
@@ -438,8 +436,6 @@ box2 = ax2.boxplot(
 )
 
 
-
-
 # Format axes, set size and plot
 ax0.grid()
 ax1.grid()
@@ -464,6 +460,10 @@ plt.subplots_adjust(top = 0.862)
 
 plt.savefig("/app/resultsPickAndPlaceControllerOptimisation.pdf", bbox_inches='tight')
 plt.show()
+
+
+
+
 
 
 
@@ -508,8 +508,6 @@ plt.subplots_adjust(top = 0.936, wspace=0.07, hspace=0.0043)
 
 plt.savefig("/app/dummy.pdf", bbox_inches='tight')
 plt.show()
-
-
 
 
 
