@@ -262,8 +262,8 @@ widthColours = CmTWBlue( np.linspace(0, 0.6, len(widthLabels)) )
 depthColours = CmDarkBlue( np.linspace(0.4, 0.6, len(depthLabels)) )
 
 ax1.set_ylabel("Average Return")
-ax1.set_xlabel("Neural Network Width [Neurons]")
-ax2.set_xlabel("Neural Network Depth [Hidden Layers]")
+ax1.set_xlabel("Neural Network Width")
+ax2.set_xlabel("Neural Network Depth")
 
 barwidth = 0.8
 
@@ -312,6 +312,19 @@ import matplotlib.pyplot as plt
 import matplotlib
 
 matplotlib.style.use("default")
+
+## Set matplotlib figure size as seen here
+# https://stackoverflow.com/questions/44970010/axes-class-set-explicitly-size-width-height-of-axes-in-given-units
+def set_size(w,h, ax=None):
+    """ w, h: width, height in inches """
+    if not ax: ax=plt.gca()
+    l = ax.figure.subplotpars.left
+    r = ax.figure.subplotpars.right
+    t = ax.figure.subplotpars.top
+    b = ax.figure.subplotpars.bottom
+    figw = float(w)/(r-l)
+    figh = float(h)/(t-b)
+    ax.figure.set_size_inches(figw, figh)
 
 import sys
 sys.path.append("/app/MTExperiments/Plots")

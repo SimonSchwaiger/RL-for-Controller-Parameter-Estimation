@@ -451,7 +451,7 @@ ax0.set_xticks([1, 2, 3], ['J1', 'J2', 'J3'])
 ax1.set_xticks([1, 2, 3], ['J1', 'J2', 'J3'])
 ax2.set_xticks([1, 2, 3], ['J1', 'J2', 'J3'])
 
-fig.suptitle("Trajectory Control For Pick and Place Task", fontsize=16)
+fig.suptitle("Simulated Pick and Place Trajectory Control", fontsize=16)
 
 set_size(7,3.6)
 plt.tight_layout()

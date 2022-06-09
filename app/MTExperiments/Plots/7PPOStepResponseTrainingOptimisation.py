@@ -494,10 +494,10 @@ ax2.set_xlabel('Training Steps')
 #ax2.set_ylabel('Mean Return')
 
 
-plt.suptitle("PPO Training with epsilon = 1.0", fontsize=16)
+plt.suptitle("PPO Advantage Estimation", fontsize=16)
 
 #xlim = []
-ylim = [-80, -10]
+ylim = [-90, -10]
 
 #ax1.set_xlim(xlim)
 #ax2.set_xlim(xlim)

@@ -33,7 +33,7 @@ def detectStep(signal, thresshold = 0.001):
 ## Load Step 1 real robot data from hebi logs
 ts = 0.002
 stepDuration=1.5
-filename = "/app/MTExperiments/HebiLogs/export/Step1X59ShortTubeStepNoLoad.csv"
+filename = "/app/MTExperiments/HebiLogs/Step/export/Step1X59ShortTubeStepNoLoad.csv"
 
 cmd = []
 pos = []
@@ -72,7 +72,7 @@ step1SimRobotPos = env.env.latestTrajectory[start:end]
 
 ####################################################
 ## Load Step 2 real robot data from hebi logs
-filename = "/app/MTExperiments/HebiLogs/export/Step2X59ShortTubeStepNoLoad.csv"
+filename = "/app/MTExperiments/HebiLogs/Step/export/Step2X59ShortTubeStepNoLoad.csv"
 
 cmd = []
 pos = []
@@ -155,8 +155,8 @@ ax1.set_xlabel("Time [sec]")
 
 ax0.set_ylabel("Actuator Position [rad]")
 
-ax0.set_title("Step Response 0 to -1.57 Radians") 
-ax1.set_title("Step Response -1.57 to 0 Radians")
+ax0.set_title("Step Response 1") 
+ax1.set_title("Step Response 2")
 
 ## Plot step 1
 # Real robot position

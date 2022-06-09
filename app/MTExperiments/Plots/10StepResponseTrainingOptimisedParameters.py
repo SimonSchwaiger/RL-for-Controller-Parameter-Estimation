@@ -85,7 +85,7 @@ DDPGConfig = {
     "modelrun": 0,
     "modelname": "DDPG",
     "learningRate": 0.0001,
-    "tau": 0.002,  
+    "tau": 0.001,  
     "trainingTimesteps": trainingSteps,
     "policyNetwork": None,
     "optimizer": None,
@@ -187,9 +187,9 @@ def runAgentTests(config, testRuns=5):
 
 # Perform testruns of all configurations
 if runTraining:
-    #runAgentTests(DQNConfig)
-    #runAgentTests(DDPGConfig)
-    #runAgentTests(PPODiscreteConfig)
+    runAgentTests(DQNConfig)
+    runAgentTests(DDPGConfig)
+    runAgentTests(PPODiscreteConfig)
     runAgentTests(PPOContinuousConfig)
 
 
@@ -510,7 +510,7 @@ plt.show()
 
 
 # Calculate percentual decrease in control error:
-print("Raw achieved control offsets: {}".format( [ np.mean(entry) for entry in evalEpisodeResults ] ))
+print("Raw achieved control offsets: {}".format( [ np.mean(entry) for entry in evalEpisodeResults ][:4] ))
 
 errorReductionPercent = []
 for entry in evalEpisodeResults[:4]:

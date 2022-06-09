@@ -82,9 +82,9 @@ traj1Filepaths = [
 # Set up suptitles, colours and annotations for each cell
 subplotTitles = [
     [ "Reference Trajectory", "Reference Trajectory" ],
-    [ "Joint 0 Error", "Joint 0 Error" ],
     [ "Joint 1 Error", "Joint 1 Error" ],
-    [ "Joint 2 Error", "Joint 2 Error" ]
+    [ "Joint 2 Error", "Joint 2 Error" ],
+    [ "Joint 3 Error", "Joint 3 Error" ]
 ]
 
 errorColours = [

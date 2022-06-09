@@ -44,7 +44,7 @@ config = {
 """
 
 runTraining = False      # Determines, whether or not training is conducted or only visualisation is performed
-trainingSteps = 15000   # Determines performed training steps
+trainingSteps = 15000    # Determines performed training steps
 
 # Start tensorboard to allow for visualisation of training process
 logdir = "/app/MTExperiments/Data/4StepResponseTrainingDefaultParams"
@@ -347,11 +347,11 @@ for i, d in enumerate(data):
     ax.fill_between(x, cl, cu,color=colours[i], alpha=.1)
 
 
-plt.suptitle("Mean Return during Agent Training", fontsize=16)
+plt.suptitle("Agent Training Mean Return", fontsize=16)
 plt.xlabel('Training Steps')
 plt.ylabel('Mean Return')
 #plt.xlim([-12500, 1000])
-plt.ylim([-80, -10])
+plt.ylim([-90, -10])
 plt.grid()
 plt.legend()
 
@@ -483,7 +483,7 @@ ax0.set_ylabel("Negative Mean Squared Control Error")
 ax0.set_title("With Random Agent") 
 ax1.set_title("Without Random Agent")
 
-fig.suptitle("Controller Evaluation Episode Results", fontsize=16)
+fig.suptitle("Controller Evaluation Episodes", fontsize=16)
 
 set_size(7,3.6)
 plt.tight_layout()

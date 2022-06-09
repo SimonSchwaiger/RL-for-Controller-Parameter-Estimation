@@ -43,7 +43,7 @@ config = {
 }
 """
 
-runTraining = True      # Determines, whether or not training is conducted or only visualisation is performed
+runTraining = False      # Determines, whether or not training is conducted or only visualisation is performed
 trainingSteps = 15000   # Determines performed training steps
 
 # Start tensorboard to allow for visualisation of training process
@@ -236,11 +236,11 @@ for i, d in enumerate(data):
     #ax.fill_between(x, cl, cu,color=colours[i], alpha=.1)
 
 
-plt.suptitle("DQN Training at different Discretisation Levels", fontsize=16)
+plt.suptitle("DQN Discretisation Levels", fontsize=16)
 plt.xlabel('Training Steps')
 plt.ylabel('Mean Return')
 #plt.xlim([-12500, 1000])
-plt.ylim([-80, -20])
+plt.ylim([-90, -20])
 plt.grid()
 plt.legend()
 
@@ -379,7 +379,7 @@ plt.tight_layout()
 
 plt.subplots_adjust(top = 0.862)
 
-#plt.savefig("/app/resultsStepResponseDefaultParamsControlErrorBox.pdf", bbox_inches='tight')
+plt.savefig("/app/resultsStepResponseDefaultParamsControlErrorBox.pdf", bbox_inches='tight')
 plt.show()
 
 

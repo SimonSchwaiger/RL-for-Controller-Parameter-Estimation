@@ -35,7 +35,7 @@ plt.rcParams.update({'font.size': 12})
 
 
 fig, (ax0, ax1, ax2) = plt.subplots(3, sharex=True)
-fig.suptitle("Approximated Transfer Function Step Response", fontsize=16)
+fig.suptitle("Approximated Transfer Elements", fontsize=16)
 
 labels = [
     "Continuous Transfer Element Output",
