@@ -1,0 +1,4 @@
+<map id="discreteActionWrapper.jointcontrolDiscrete" name="discreteActionWrapper.jointcontrolDiscrete">
+<area shape="rect" id="node1" title="Class wrapping the jointcontrol gym environment to have a discrete action space, enabling usage of mo..." alt="" coords="5,80,253,121"/>
+<area shape="rect" id="node2" title=" " alt="" coords="72,5,187,32"/>
+</map>
