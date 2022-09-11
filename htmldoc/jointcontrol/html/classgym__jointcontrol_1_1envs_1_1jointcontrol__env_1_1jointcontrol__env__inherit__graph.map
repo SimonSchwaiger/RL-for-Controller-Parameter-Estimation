@@ -1,4 +1,0 @@
-<map id="gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env" name="gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env">
-<area shape="rect" id="node1" title="Class implementing the control problem as a Gym Environment." alt="" coords="5,80,251,121"/>
-<area shape="rect" id="node2" title=" " alt="" coords="87,5,169,32"/>
-</map>
