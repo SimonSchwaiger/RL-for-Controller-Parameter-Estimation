@@ -23,6 +23,7 @@ $(function() {
 <li>__del__()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#ae697635ad5edc75f2611e4f34e33702f">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 , <a class="el" href="classphysicsServer_1_1bulletInstance.html#ae507a24fc6d065255159221170371979">physicsServer.bulletInstance</a>
+, <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a77605d5acca8edddd16fac5e548508da">sharedMemJointMetric.sharedMemJointMetric</a>
 </li>
 <li>__init__()
 : <a class="el" href="classcontrollers_1_1DBlock.html#af61a177a562e03a9137aae576468b7b1">controllers.DBlock</a>
@@ -30,12 +31,15 @@ $(function() {
 , <a class="el" href="classcontrollers_1_1PT1Block.html#a832da0f0296ea759f43ba583cb444f36">controllers.PT1Block</a>
 , <a class="el" href="classcontrollers_1_1PT2Block.html#a8d3bbee6fcaa540967a770f74c7c69ac">controllers.PT2Block</a>
 , <a class="el" href="classcontrollers_1_1smartPID.html#a4a7732259d2ee714563260717f03fb24">controllers.smartPID</a>
-, <a class="el" href="classcontrollers_1_1strategy4Controller.html#ac3b0aa2024cf6639618ec3ffa6ae8733">controllers.strategy4Controller</a>
+, <a class="el" href="classcontrollers_1_1strategy4Controller.html#a6bb31d78adfbc5c7417257ec2d5e7655">controllers.strategy4Controller</a>
 , <a class="el" href="classcontrollerTest_1_1controllerTest.html#a557583be5b7b03fe51ec23e4fa45f617">controllerTest.controllerTest</a>
 , <a class="el" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a3e8278c1554d3b4422bb7da612237bcf">discreteActionWrapper.jointcontrolDiscrete</a>
 , <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a00d1a9398ec4108fe267181ee1d0402c">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+, <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1performanceTimer.html#aeb94f3a28cbf6856fc98873b0336a9b9">gym_jointcontrol.envs.jointcontrol_env.performanceTimer</a>
 , <a class="el" href="classphysicsServer_1_1bulletInstance.html#a3eab07ca117b997e5ef4563c79751575">physicsServer.bulletInstance</a>
-, <a class="el" href="classphysicsServer_1_1ROSWrapper.html#a80415632db7de6dd4aff7f521f2cfa79">physicsServer.ROSWrapper</a>
+, <a class="el" href="classphysicsServer_1_1performanceTimer.html#adf771a278602cca95b42189c43c0d731">physicsServer.performanceTimer</a>
+, <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#adf99aea82fe4887e005000cbf0850b5d">physicsServer.sharedMemWrapper</a>
+, <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ab776dc6eede045ca46c5841aabcd193a">sharedMemJointMetric.sharedMemJointMetric</a>
 </li>
 </ul>
 
@@ -51,6 +55,10 @@ $(function() {
 <li>activeModels
 : <a class="el" href="classphysicsServer_1_1bulletInstance.html#ab01d89a6b996e976a759c81d5b68083a">physicsServer.bulletInstance</a>
 </li>
+<li>addTimestamp()
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1performanceTimer.html#ad09fb8f2c6c87a94679361efad7ebde2">gym_jointcontrol.envs.jointcontrol_env.performanceTimer</a>
+, <a class="el" href="classphysicsServer_1_1performanceTimer.html#a8063c03fe9da5230d9e0cc80a1aa127f">physicsServer.performanceTimer</a>
+</li>
 <li>addUrdf()
 : <a class="el" href="classphysicsServer_1_1bulletInstance.html#ab263661faa11b56313ce4f09dd0d752c">physicsServer.bulletInstance</a>
 </li>
@@ -58,6 +66,15 @@ $(function() {
 
 
 <h3><a id="index_c"></a>- c -</h3><ul>
+<li>checkReady()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ad14e2e0f1a8e17a0c158f7891da9b798">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>checkRegistered()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a382f9c4411ca597083c0c20d4f3c3561">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>closeSharedMem()
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#ad38a2438377896bc784a63d52753bb54">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
 <li>compute_reard()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a668f5476d695b957714e521230061d87">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
@@ -102,16 +119,37 @@ $(function() {
 <li>EffortPID
 : <a class="el" href="classcontrollers_1_1strategy4Controller.html#a17b8f2707ce915247a6f0d8397cd3024">controllers.strategy4Controller</a>
 </li>
+<li>emptyUpdateCount
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#abd2aef7d532a344867e5e329df91b7cf">physicsServer.sharedMemWrapper</a>
+</li>
 <li>env
 : <a class="el" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a16d5bdffea4eba10708f25e45e407ac3">discreteActionWrapper.jointcontrolDiscrete</a>
+</li>
+<li>episodeConfig
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a8278381b46f92f3be31a1656a3b77ca2">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
+<li>episodeType
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a5e8480e46ae8ba7454d902651c3349db">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
 </ul>
 
 
 <h3><a id="index_f"></a>- f -</h3><ul>
+<li>feedbackBlueprint
+: <a class="el" href="classphysicsServer_1_1bulletInstance.html#adee3bd58493c831d6deb2e33c512476a">physicsServer.bulletInstance</a>
+</li>
+<li>feedbackCmd
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a2041ffdb489f4648c174dbd91dcd9368">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>feedbackCommands
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#ab58e37f1fd4a00eacc8ee199b4d41b2f">physicsServer.sharedMemWrapper</a>
+</li>
 <li>feedforward
 : <a class="el" href="classcontrollers_1_1PIDController.html#a5e5c4188e872448fcc13473f0cb2f558">controllers.PIDController</a>
 , <a class="el" href="classcontrollers_1_1smartPID.html#a4cda242b9e254129e2aac78c65d6df6b">controllers.smartPID</a>
+</li>
+<li>flushState()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#add7f4f392a43bc4ea7c7efd6b63a9f0f">sharedMemJointMetric.sharedMemJointMetric</a>
 </li>
 <li>formatObs()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a1395f1e5085687f81188249b2d65bf4f">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
@@ -122,6 +160,9 @@ $(function() {
 <h3><a id="index_g"></a>- g -</h3><ul>
 <li>getJointState()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a06366ff171f3d79d02020c87f2282ead">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
+<li>getState()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a3bef6f10d9b7e4b686b78fb00f642e0d">sharedMemJointMetric.sharedMemJointMetric</a>
 </li>
 </ul>
 
@@ -134,8 +175,17 @@ $(function() {
 
 
 <h3><a id="index_j"></a>- j -</h3><ul>
+<li>jointFeedback
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ad33eeec6a5b0cef4b89ab7cf573a4a3c">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>jointID
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ac8d3a30f9deebfc4c36108d46112478c">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
 <li>jointidx
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#affd602c0f1d0a6414d95c1e61f51ebd4">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
+<li>jointMetrics
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#ac009111eb545741886dc065d3a517f02">physicsServer.sharedMemWrapper</a>
 </li>
 <li>jointParams
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a5a91f6b51ea5d447029db1f68ad68bcd">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
@@ -174,11 +224,17 @@ $(function() {
 
 
 <h3><a id="index_l"></a>- l -</h3><ul>
+<li>latestControllerOutput
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#aef68c11423f59b8019584165b090b723">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
 <li>latestTrajectory
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a68269d52cd249ff1c9d1add73e914389">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
 <li>loadBulletTarget()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a0f96ddc3984e6c86fe927232acff0369">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
+<li>loadState()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ad83ff9f94b614f0c8111747218f54b95">sharedMemJointMetric.sharedMemJointMetric</a>
 </li>
 </ul>
 
@@ -191,8 +247,12 @@ $(function() {
 
 
 <h3><a id="index_n"></a>- n -</h3><ul>
+<li>names
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1performanceTimer.html#a552df687411d7e3313f53f778bf8b543">gym_jointcontrol.envs.jointcontrol_env.performanceTimer</a>
+, <a class="el" href="classphysicsServer_1_1performanceTimer.html#a045d1e34c77bb662f14d78801262623f">physicsServer.performanceTimer</a>
+</li>
 <li>NumJoints
-: <a class="el" href="classphysicsServer_1_1ROSWrapper.html#acf13ff617aaf323ec76d0ee3bec3c3f7">physicsServer.ROSWrapper</a>
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#a3acbd60a96de160dddb9e042330c1641">physicsServer.sharedMemWrapper</a>
 </li>
 <li>numParams
 : <a class="el" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a28144269aa9b27f06aa6bba4f6740d6d">discreteActionWrapper.jointcontrolDiscrete</a>
@@ -224,8 +284,10 @@ $(function() {
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a8a2f787e99d7304df90cca948706465f">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
 <li>physicsClient
-: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a6c7bdc155ffd941006862158150e6702">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
-, <a class="el" href="classphysicsServer_1_1bulletInstance.html#ae07283377381cfc61d56890d10a48d1e">physicsServer.bulletInstance</a>
+: <a class="el" href="classphysicsServer_1_1bulletInstance.html#ae07283377381cfc61d56890d10a48d1e">physicsServer.bulletInstance</a>
+</li>
+<li>physicsCommand
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a206dfeb9a154589d4830adc2656580a7">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
 <li>PID
 : <a class="el" href="classcontrollers_1_1smartPID.html#a9a8df9087e6057557b04e505364dd864">controllers.smartPID</a>
@@ -233,24 +295,34 @@ $(function() {
 <li>plotResults()
 : <a class="el" href="classcontrollerTest_1_1controllerTest.html#a54b45d26577e982639824fa8431a0960">controllerTest.controllerTest</a>
 </li>
+<li>posControlCmd
+: <a class="el" href="classphysicsServer_1_1bulletInstance.html#a5c4b9bf8ffc8cffe63b3d6772d5e4eae">physicsServer.bulletInstance</a>
+</li>
 <li>positionControlUpdate()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a7133fc07807e19c81968752e9fdd7da4">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
 <li>PositionPID
 : <a class="el" href="classcontrollers_1_1strategy4Controller.html#a61ef9c5c8400355bc536405567e80fe6">controllers.strategy4Controller</a>
 </li>
-<li>PWMFilter
-: <a class="el" href="classcontrollers_1_1strategy4Controller.html#a4e0813076a72c0bdab7a2180afeed6c2">controllers.strategy4Controller</a>
+<li>printSummary()
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1performanceTimer.html#aaec61e039cccc4559aebcffa05969cfb">gym_jointcontrol.envs.jointcontrol_env.performanceTimer</a>
+, <a class="el" href="classphysicsServer_1_1performanceTimer.html#a8abd7b85e765fe64b88701df9aade1fb">physicsServer.performanceTimer</a>
 </li>
 </ul>
 
 
 <h3><a id="index_r"></a>- r -</h3><ul>
 <li>ready
-: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#af727605be7b5e16ffce6494433db83c6">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ab50caf037cf42c96df2bcfc73ccd6f81">sharedMemJointMetric.sharedMemJointMetric</a>
 </li>
-<li>readyEnvs
-: <a class="el" href="classphysicsServer_1_1bulletInstance.html#a02acc42928612a26d71a3c7611ea69bf">physicsServer.bulletInstance</a>
+<li>regex
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a9937e430579ea836c35d905a711ddc6c">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>registered
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a327f0282830cf5812bbabeedddc3a44e">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>registeredEnvs
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#a5251017007cc37af509e6ffb878e1d4e">physicsServer.sharedMemWrapper</a>
 </li>
 <li>removeArraysFromTestResults()
 : <a class="el" href="classcontrollerTest_1_1controllerTest.html#a9d1e5dc85d6b3855c084c3d531ac64a9">controllerTest.controllerTest</a>
@@ -259,12 +331,17 @@ $(function() {
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a15c5701f4090867010b84108f99a2730">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
 <li>reset()
-: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#ae77eca358fdc697230a5ce62bad41b32">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a4b5450fed1d49b312b2248a42cd2e0b1">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+, <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1performanceTimer.html#a53e31ef71764373dfd8f8ad382daadb9">gym_jointcontrol.envs.jointcontrol_env.performanceTimer</a>
+, <a class="el" href="classphysicsServer_1_1performanceTimer.html#a0e5ec18289d1c44494bec2fd1b4017da">physicsServer.performanceTimer</a>
 </li>
 </ul>
 
 
 <h3><a id="index_s"></a>- s -</h3><ul>
+<li>server
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#af53d01d21dacc3b7a9abfa5ceb3995ad">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
 <li>setConstants()
 : <a class="el" href="classcontrollers_1_1DBlock.html#a24fbe461b5cf4fbcfa35023089bf1bbf">controllers.DBlock</a>
 , <a class="el" href="classcontrollers_1_1PIDController.html#a36704d061867ebe1217fa802a0f769d1">controllers.PIDController</a>
@@ -272,24 +349,28 @@ $(function() {
 , <a class="el" href="classcontrollers_1_1PT2Block.html#a100dd969c1ea692cd2df9241bbf496d5">controllers.PT2Block</a>
 , <a class="el" href="classcontrollers_1_1smartPID.html#ae4e4dec6fedf509c743e46de93244268">controllers.smartPID</a>
 </li>
+<li>setState()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#aca71888a653d333690675e8bb0d01811">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>setTrajectoryConfig()
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a1137e39b9d8cb46712351bdcdd89928e">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
+</li>
+<li>sharedMemSize
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ae27b0ee1c1195f7769b33d7100342048">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>shm
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#ab99d66769b2bdf037eb34c66469372e2">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
 <li>sim
-: <a class="el" href="classphysicsServer_1_1ROSWrapper.html#a343ebc3d02ba19f0dd26df09ee4e751d">physicsServer.ROSWrapper</a>
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#a1ef4c644731edb8427bf7fdde0b7f964">physicsServer.sharedMemWrapper</a>
+</li>
+<li>stamps
+: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1performanceTimer.html#a6d25428164bc3ad57952191e2a73ad66">gym_jointcontrol.envs.jointcontrol_env.performanceTimer</a>
+, <a class="el" href="classphysicsServer_1_1performanceTimer.html#a7a067a934daf75e940b21c8240e8fea2">physicsServer.performanceTimer</a>
 </li>
 <li>step()
 : <a class="el" href="classdiscreteActionWrapper_1_1jointcontrolDiscrete.html#a2a7290a3e6303bc6e353d4da214515cd">discreteActionWrapper.jointcontrolDiscrete</a>
 , <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#ac94b50753c961c06b7e28708bf650135">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
-</li>
-<li>syncCallback()
-: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a12dcd57da6815b83f8ede1eee8bd22e0">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
-, <a class="el" href="classphysicsServer_1_1ROSWrapper.html#a1b1ba2ef00d0f6f926a1f6c372320f53">physicsServer.ROSWrapper</a>
-</li>
-<li>syncPub
-: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a0a976901cb4b39831dbb6c9141700425">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
-, <a class="el" href="classphysicsServer_1_1ROSWrapper.html#a0614ef56bc5d1d864dea1a7a11565e5d">physicsServer.ROSWrapper</a>
-</li>
-<li>syncSub
-: <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a07392f488e81b3c3e362d1e60183dd90">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
-, <a class="el" href="classphysicsServer_1_1ROSWrapper.html#a77e2b6f8f276b2e7090729758782291a">physicsServer.ROSWrapper</a>
 </li>
 </ul>
 
@@ -304,6 +385,9 @@ $(function() {
 <li>testResults
 : <a class="el" href="classcontrollerTest_1_1controllerTest.html#a4a7e573db3b425f613d1f6b69af8b981">controllerTest.controllerTest</a>
 </li>
+<li>torqueControlCmd
+: <a class="el" href="classphysicsServer_1_1bulletInstance.html#ae3f0d9035b7e2055e19ecca7c0751397">physicsServer.bulletInstance</a>
+</li>
 <li>torqueControlUpdate()
 : <a class="el" href="classgym__jointcontrol_1_1envs_1_1jointcontrol__env_1_1jointcontrol__env.html#a6be7daa5851ab2aa9a76b6e2b6f22287">gym_jointcontrol.envs.jointcontrol_env.jointcontrol_env</a>
 </li>
@@ -315,6 +399,9 @@ $(function() {
 
 
 <h3><a id="index_u"></a>- u -</h3><ul>
+<li>unregister()
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#a124242d4048409543352928333c2cc47">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
 <li>update()
 : <a class="el" href="classcontrollers_1_1DBlock.html#a99e89ef3918fa6b80ce17bbf243539a8">controllers.DBlock</a>
 , <a class="el" href="classcontrollers_1_1PIDController.html#a49d541d003491c834f37b9be696c095a">controllers.PIDController</a>
@@ -322,7 +409,19 @@ $(function() {
 , <a class="el" href="classcontrollers_1_1PT2Block.html#aa995eec9f2b60ef9b2b3e75a5377e3c0">controllers.PT2Block</a>
 , <a class="el" href="classcontrollers_1_1smartPID.html#a4e35d685e5f4626d50c92264b514fc0a">controllers.smartPID</a>
 , <a class="el" href="classcontrollers_1_1strategy4Controller.html#a0f45685981bd9007a662b37dc03847c3">controllers.strategy4Controller</a>
-, <a class="el" href="classphysicsServer_1_1bulletInstance.html#a0cc016c245f063dfa8614cafb1e863d0">physicsServer.bulletInstance</a>
+, <a class="el" href="classphysicsServer_1_1bulletInstance.html#a37364a287e757e1b5e5ba23f22c8c039">physicsServer.bulletInstance</a>
+</li>
+<li>updateCall()
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#ab68d2a006400ef36d06fa7700f8c8b3c">physicsServer.sharedMemWrapper</a>
+</li>
+<li>updateCmd
+: <a class="el" href="classsharedMemJointMetric_1_1sharedMemJointMetric.html#aeff947e117df07081e4219e44df596f4">sharedMemJointMetric.sharedMemJointMetric</a>
+</li>
+<li>updateCommandBlueprint
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#ab0582afccef7189b3662be4934c21e51">physicsServer.sharedMemWrapper</a>
+</li>
+<li>updateCommands
+: <a class="el" href="classphysicsServer_1_1sharedMemWrapper.html#a03be7d62f9618e00ea5c336f3573ad37">physicsServer.sharedMemWrapper</a>
 </li>
 <li>updateConstants()
 : <a class="el" href="classcontrollers_1_1strategy4Controller.html#a052a8696100883d56461028ed697d04d">controllers.strategy4Controller</a>
@@ -361,7 +460,7 @@ $(function() {
 <hr size="1"><div style="align: right;">
 <a href="http://wiki.ros.org/jointcontrol">jointcontrol</a><br />
 Author(s): </br />
-<small>autogenerated on Tue Feb 15 2022 19:53:48</small>
+<small>autogenerated on Sun Sep 11 2022 08:32:31</small>
 </div>
 </body>
 </html>

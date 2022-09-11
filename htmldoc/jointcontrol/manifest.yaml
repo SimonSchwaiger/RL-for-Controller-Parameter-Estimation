@@ -3,13 +3,13 @@ authors: ''
 brief: ''
 bugtracker: ''
 depends:
-- std_msgs
 - message_runtime
-- catkin
-- rospy
-- geometry_msgs
 - sensor_msgs
 - roscpp
+- std_msgs
+- catkin
+- geometry_msgs
+- rospy
 description: The jointcontrol package
 license: TODO
 maintainers: root <root@todo.todo>

@@ -36,6 +36,7 @@ span.linenos.special { color: #000000; background-color: #ffffc0; padding-left: 
 .highlight .m { color: var(--jp-mirror-editor-number-color) } /* Literal.Number */
 .highlight .s { color: var(--jp-mirror-editor-string-color) } /* Literal.String */
 .highlight .ow { color: var(--jp-mirror-editor-operator-color); font-weight: bold } /* Operator.Word */
+.highlight .pm { color: var(--jp-mirror-editor-punctuation-color) } /* Punctuation.Marker */
 .highlight .w { color: var(--jp-mirror-editor-variable-color) } /* Text.Whitespace */
 .highlight .mb { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Bin */
 .highlight .mf { color: var(--jp-mirror-editor-number-color) } /* Literal.Number.Float */
@@ -14485,10 +14486,6 @@ a.anchor-link {
   display: none;
 }
 
-.highlight  {
-  margin: 0.4em;
-}
-
 /* Input area styling */
 .jp-InputArea {
   overflow: hidden;
@@ -14498,9 +14495,26 @@ a.anchor-link {
   overflow: hidden;
 }
 
-.CodeMirror pre {
+.CodeMirror.cm-s-jupyter .highlight pre {
+/* weird, but --jp-code-padding defined to be 5px but 4px horizontal padding is hardcoded for pre.CodeMirror-line */
+  padding: var(--jp-code-padding) 4px;
   margin: 0;
-  padding: 0;
+
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  color: inherit;
+
+}
+
+.jp-OutputArea-output pre {
+  line-height: inherit;
+  font-family: inherit;
+}
+
+.jp-RenderedText pre {
+  color: var(--jp-content-font-color1);
+  font-size: var(--jp-code-font-size);
 }
 
 /* Using table instead of flexbox so that we can use break-inside property */
@@ -14580,12 +14594,12 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
                 },
                 displayAlign: 'center',
                 CommonHTML: {
-                    linebreaks: { 
-                    automatic: true 
+                    linebreaks: {
+                    automatic: true
                     }
                 }
             });
-        
+
             MathJax.Hub.Queue(["Typeset", MathJax.Hub]);
         }
     }
@@ -14636,7 +14650,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p><img src="images/AppDeploymentStructure.jpg" width="800"/></p>
+<img src="images/AppDeploymentStructure.jpg" width="800"/>
 <p><em>Figure 1: The system is implemented using the Pybullet physics simulator, OpenAI Gym and the Robot Operating System (ROS). It allows for simultaneous training of an arbitrary number of agents by instantiating multiple Gym environments that all connect to one shared and synchronised physics simulation.</em></p>
 
 </div>
@@ -14652,6 +14666,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <style>
   table {margin-left: 0 !important;}
 </style>
+
 </div>
 </div>
 </div>
@@ -14674,47 +14689,16 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 </div>
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<table>
-<thead><tr>
-<th>Package Name</th>
-<th style="text-align:left">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><a href="https://pybullet.org/wordpress/">Pybullet</a></td>
-<td style="text-align:left">Python-accesible version of the Bullet physics simulator</td>
-</tr>
-<tr>
-<td><a href="https://www.ros.org/">Robot Operating System (ROS)</a></td>
-<td style="text-align:left">Framework for implementing robot systems</td>
-</tr>
-<tr>
-<td><a href="https://gym.openai.com/">OpenAI Gym</a></td>
-<td style="text-align:left">Reinforcement Learning framework with standardised interface between agent and environment</td>
-</tr>
-<tr>
-<td><a href="https://github.com/hill-a/stable-baselines">Stable Baselines</a></td>
-<td style="text-align:left">Implementation of common RL algorithms for OpenAI Gym</td>
-</tr>
-<tr>
-<td><a href="https://www.tensorflow.org/">Tensorflow</a></td>
-<td style="text-align:left">Machine Learning library for Python</td>
-</tr>
-<tr>
-<td><a href="https://numpy.org/">Numpy</a></td>
-<td style="text-align:left">Python module for data management</td>
-</tr>
-<tr>
-<td><a href="https://matplotlib.org/">Matplotlib</a></td>
-<td style="text-align:left">Python module for data visualisation</td>
-</tr>
-<tr>
-<td><a href="https://jupyterlab.readthedocs.io/en/stable">JupyterLab</a></td>
-<td style="text-align:left">Python notebook IDE for interactive programming and data visualisation</td>
-</tr>
-</tbody>
-</table>
+<p>| Package Name  | Description     |
+| ------------- |:--------------- |
+| <a href="https://pybullet.org/wordpress/">Pybullet</a> | Python-accesible version of the Bullet physics simulator |
+| <a href="https://www.ros.org/">Robot Operating System (ROS)</a> | Framework for implementing robot systems |
+| <a href="https://gym.openai.com/">OpenAI Gym</a> | Reinforcement Learning framework with standardised interface between agent and environment |
+| <a href="https://github.com/hill-a/stable-baselines">Stable Baselines</a> | Implementation of common RL algorithms for OpenAI Gym |
+| <a href="https://www.tensorflow.org/">Tensorflow</a> | Machine Learning library for Python |
+| <a href="https://numpy.org/">Numpy</a> | Python module for data management |
+| <a href="https://matplotlib.org/">Matplotlib</a> | Python module for data visualisation |
+| <a href="https://jupyterlab.readthedocs.io/en/stable">JupyterLab</a> | Python notebook IDE for interactive programming and data visualisation |</p>
 <p><em>Table 1: Multiple openly available software packages were used to implement the application.</em></p>
 
 </div>
@@ -14730,7 +14714,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <h2 id="Code-Reference">Code Reference<a class="anchor-link" href="#Code-Reference">&#182;</a></h2><p>While the algorithms are documented using <a href="https://jupyter.org/">JupyterLab</a>, the core ROS package is documented using <a href="http://wiki.ros.org/rosdoc_lite">rosdoc_lite</a> and <a href="https://www.doxygen.nl/index.html">Doxygen</a>. This section provides direct links to the documentation for each component. Links tagged with <em>[Notebook]</em> are links to html versions of the interactive notebooks used for model training and testing and have been provided to allow them to be easily viewed in a browser without having to install a notebook viewer.</p>
 <ul>
 <li>Autogenerated documentation of the jointcontrol ROS package <a href="./htmldoc/jointcontrol/html/index.html"><strong>link</strong></a></li>
-<li>Step response testing of each discretised control block <a href="./htmldoc/testControllerBlocks.html"><strong>link [Notebook]</strong></a> </li>
+<li>Step response testing of each discretised control block <a href="./htmldoc/testControllerBlocks.html"><strong>link [Notebook]</strong></a></li>
 <li><strong>Deep Deterministic Policy Gradients</strong> agent for controller parameter estimation <a href="./htmldoc/DDPG.html"><strong>link [Notebook]</strong></a></li>
 <li><strong>Deep Q-Network</strong> agent for controller parameter estimation <a href="./htmldoc/DQN.html"><strong>link [Notebook]</strong></a></li>
 <li><strong>Proximal Policy Optimisation</strong> agent for controller parameter estimation <a href="./htmldoc/PPO1.html"><strong>link [Notebook]</strong></a></li>
@@ -14769,6 +14753,7 @@ body[data-format='mobile'] .jp-OutputArea-child .jp-OutputArea-output {
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <center>____________________________________________________________________________________________________________________________</center>
+
 </div>
 </div>
 </div>
