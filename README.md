@@ -16,5 +16,15 @@ This is a list of important directories in this repository.
 
 ## Documentation
 
-The documentation for the software is provided in HTML form, with the mainpage being *documentation.html*. From there, all the relevant sources and documentation is linked.
+The documentation for the software is provided in HTML form, with the mainpage being *documentation/documentation.html*. From there, all the relevant sources and documentation are linked.
 Additionally, *documentation.html* provides a quickstart guide to get the application up and running. The Docker image is documented in a standalone fashion in a separate [Github repository](https://github.com/SimonSchwaiger/ros-ml-container).
+
+## Compatibility
+
+As long as a means of OpenGL is provided for the Bullet simulator, the application should be able to be started using Docker. The application was tested on the following hardware and software configuration:
+
+- **CPU:** Intel Core i7 12700
+- **GPU:** Radeon RX 6700 XT
+- **Host OS:** Ubuntu 20.04 LTS
+- **GPU Driver:** Proprietary amdgpu Driver Version 21.10
+- **Docker Version:** 20.10.16
