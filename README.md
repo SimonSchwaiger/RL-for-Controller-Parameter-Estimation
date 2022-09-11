@@ -27,4 +27,4 @@ As long as a means of OpenGL is provided for the Bullet simulator, the applicati
 - **GPU:** Radeon RX 6700 XT
 - **Host OS:** Ubuntu 20.04 LTS
 - **GPU Driver:** Proprietary amdgpu Driver Version 21.10
-- **Docker Version:** 20.10.16
+- **Docker Version:** 20.10.14
