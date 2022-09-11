@@ -11,7 +11,7 @@ This is a list of important directories in this repository.
 - **/app/MTExperiments**: Contains conducted experiments as part of the thesis. *TrainingScripts* contains blueprints for control signal generation, model training and model evaluation, while *Plots* contains the implementation of training and result visualisation for each conducted experiment.
 - **/src/jointcontrol**: Contains the implemented ROS package including the gym environment and robot description. *scripts* contains implementations of the controller model, discrete environment wrapper, physics server (instantiates and synchronises physics simulation) and the shared memory implementation.
 - **/ros-ml-container**: Contains Docker build files and is the location, where the application will be built
-- **/htmldoc**: Contains generated documentation for the repository
+- **/documentation**: Contains generated documentation for the repository
 - **/app/Notebooks**: Contains the notebooks documenting preliminary testing (using an old stable-baselines version)
 
 ## Documentation
